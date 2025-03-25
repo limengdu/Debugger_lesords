@@ -12,7 +12,7 @@ void appErrorHandler(int errorCode, const char* errorMsg) {
     // 也可以通过UART发送错误信息
 }
 
-int main() {
+void setup() {
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
 
@@ -72,11 +72,8 @@ int main() {
 
     // 启动FreeRTOS调度器
     vTaskStartScheduler();
+}
 
-    // 如果运行到这里，说明出现了问题
-    for (;;) {
-        // 程序不应该运行到这里
-    }
-
-    return 0;
+void loop()
+{
 }
