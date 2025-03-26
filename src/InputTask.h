@@ -24,7 +24,7 @@ public:
     void setStateMachine(StateMachine* machine);
     
     // 启动输入任务
-    bool start(UBaseType_t priority = tskIDLE_PRIORITY + 2);
+    bool start(UBaseType_t priority = 2);
     
     // 停止输入任务
     void stop();

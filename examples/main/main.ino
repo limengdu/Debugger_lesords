@@ -6,6 +6,15 @@
 #include "InputTask.h"
 #include "DisplayContext.h"
 
+// 创建显示上下文
+DisplayContext displayContext;
+
+// 创建状态机
+StateMachine stateMachine;
+
+// 创建输入任务
+InputTask inputTask;
+
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
     // 记录错误到日志
@@ -13,11 +22,10 @@ void appErrorHandler(int errorCode, const char* errorMsg) {
 }
 
 void setup() {
+    Serial.begin(9600);
+
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
-
-    // 创建显示上下文
-    DisplayContext displayContext;
 
     // 注册状态
     StateManager* stateManager = StateManager::getInstance();
@@ -38,9 +46,6 @@ void setup() {
     ErrorState* errorState = new ErrorState();
     stateManager->registerState(errorState);
 
-    // 创建状态机
-    StateMachine stateMachine;
-
     // 设置错误处理器
     stateMachine.setErrorHandler(appErrorHandler);
 
@@ -53,25 +58,22 @@ void setup() {
         while(1); // 或者重启系统
     }
 
-    // 创建输入任务
-    InputTask inputTask;
     inputTask.setStateMachine(&stateMachine);
 
     // 启动状态机任务
-    if (!stateMachine.start(tskIDLE_PRIORITY + 1)) {
+    if (!stateMachine.start(1)) {
         // 启动失败处理
         while(1);
     }
 
     // 启动输入任务
-    if (!inputTask.start(tskIDLE_PRIORITY + 2)) {
+    if (!inputTask.start(2)) {
         // 启动失败处理
         stateMachine.stop();
         while(1);
     }
 
-    // 启动FreeRTOS调度器
-    vTaskStartScheduler();
+    Serial.printf("All settings are successful\n");
 }
 
 void loop()

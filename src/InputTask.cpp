@@ -1,6 +1,10 @@
 #include "InputTask.h"
 #include "Event.h"
 
+#include <Arduino.h>
+
+#define INPUT_DEBUG
+
 InputTask::InputTask() 
     : m_wheelTask(0), 
       m_buttonTask(0), 
@@ -26,7 +30,7 @@ bool InputTask::start(UBaseType_t priority) {
     BaseType_t result = xTaskCreate(
         wheelTaskFunc,
         "WheelTask",
-        128,
+        4096,
         this,
         priority,
         &m_wheelTask
@@ -40,7 +44,7 @@ bool InputTask::start(UBaseType_t priority) {
     result = xTaskCreate(
         buttonTaskFunc,
         "ButtonTask",
-        128,
+        4096,
         this,
         priority,
         &m_buttonTask
@@ -56,7 +60,7 @@ bool InputTask::start(UBaseType_t priority) {
     result = xTaskCreate(
         touchTaskFunc,
         "TouchTask",
-        128,
+        4096,
         this,
         priority,
         &m_touchTask
@@ -97,6 +101,10 @@ void InputTask::wheelTaskFunc(void* params) {
     for (;;) {
         // 轮询滚轮
         // TODO: 实现滚轮状态检测
+
+#ifdef INPUT_DEBUG
+        Serial.printf("[%s]::%d - for loop (Wheel)\n", __func__, __LINE__);
+#endif
         bool wheelMoved = false;
         bool isClockwise = true;
         
@@ -109,44 +117,52 @@ void InputTask::wheelTaskFunc(void* params) {
         }
         
         // 滚轮检测延迟
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
 void InputTask::buttonTaskFunc(void* params) {
     InputTask* inputTask = static_cast<InputTask*>(params);
     StateMachine* stateMachine = inputTask->m_stateMachine;
-    
+
     for (;;) {
         // 轮询按钮
         // TODO: 实现按钮状态检测
+
+#ifdef INPUT_DEBUG
+        Serial.printf("[%s]::%d - for loop (Button)\n", __func__, __LINE__);
+#endif
         bool buttonPressed = false;
         int buttonId = 0;
-        
+
         if (buttonPressed) {
             // 创建按钮按下事件
             ButtonEvent event(EVENT_BUTTON_PRESS, buttonId);
-            
+
             // 发送事件到状态机
             stateMachine->postEvent(&event);
         }
-        
+
         // 按钮检测延迟
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
 void InputTask::touchTaskFunc(void* params) {
     InputTask* inputTask = static_cast<InputTask*>(params);
     StateMachine* stateMachine = inputTask->m_stateMachine;
-    
+
     for (;;) {
         // 轮询触摸屏
         // TODO: 实现触摸屏状态检测
+
+#ifdef INPUT_DEBUG
+        Serial.printf("[%s]::%d - for loop (Touch)\n", __func__, __LINE__);
+#endif
         bool touchActive = false;
         int touchX = 0;
         int touchY = 0;
-        
+
         if (touchActive) {
             // 创建触摸事件
             TouchEvent event(EVENT_TOUCH_PRESS, touchX, touchY);
@@ -154,8 +170,8 @@ void InputTask::touchTaskFunc(void* params) {
             // 发送事件到状态机
             stateMachine->postEvent(&event);
         }
-        
+
         // 触摸屏检测延迟
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

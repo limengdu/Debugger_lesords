@@ -1,6 +1,8 @@
 #include "StateMachine.h"
 #include <string.h> // 用于memcpy
 
+#include <Arduino.h>
+
 StateMachine::StateMachine() 
     : m_currentState(0), 
       m_previousState(0), 
@@ -59,7 +61,7 @@ bool StateMachine::start(UBaseType_t priority) {
     BaseType_t result = xTaskCreate(
         stateMachineTaskFunc,    // 任务函数
         "StateMachine",          // 任务名称
-        256,                     // 堆栈大小，根据实际需求调整
+        4096,                     // 堆栈大小，根据实际需求调整
         this,                    // 传递给任务的参数
         priority,                // 任务优先级
         &m_stateMachineTask      // 任务句柄
@@ -83,7 +85,7 @@ void StateMachine::stateMachineTaskFunc(void* params) {
     StateMachine* machine = static_cast<StateMachine*>(params);
     
     // 先调用当前状态的onEnter
-    if (xSemaphoreTake(machine->m_stateMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(machine->m_stateMutex, (TickType_t) 10) == pdTRUE) {
         State* initialState = machine->m_currentState;
         xSemaphoreGive(machine->m_stateMutex);
         
@@ -101,6 +103,7 @@ void StateMachine::stateMachineTaskFunc(void* params) {
     uint8_t eventBuffer[MAX_EVENT_SIZE];
     
     for (;;) {
+        Serial.printf("[%s]::%d - main loop\n", __func__, __LINE__);
         // 等待事件队列
         if (xQueueReceive(machine->m_eventQueue, eventBuffer, portMAX_DELAY) == pdTRUE) {
             Event* event = reinterpret_cast<Event*>(eventBuffer);
@@ -108,6 +111,7 @@ void StateMachine::stateMachineTaskFunc(void* params) {
             // 处理事件
             machine->handleEvent(event);
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

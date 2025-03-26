@@ -35,7 +35,7 @@ public:
     bool init(State* initialState, State* errorState = 0);
     
     // 启动状态机任务
-    bool start(UBaseType_t priority = tskIDLE_PRIORITY + 1);
+    bool start(UBaseType_t priority = 1);
     
     // 停止状态机任务
     void stop();
