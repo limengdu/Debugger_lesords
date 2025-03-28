@@ -40,7 +40,7 @@ void setup() {
 
     // 注册功能状态
     stateManager->registerState(new Function1State());
-    // 注册其他功能状态...
+    // TODO: 注册其他功能状态...
 
     // 创建错误状态
     ErrorState* errorState = new ErrorState();

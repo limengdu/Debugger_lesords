@@ -70,7 +70,7 @@ private:
     const char* m_errorMessage;
     
 public:
-    enum { ID = 100 };
+    enum { ID = 0 };
     
     ErrorState();
     

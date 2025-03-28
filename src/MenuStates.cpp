@@ -8,7 +8,7 @@ MainMenuState::MainMenuState()
 {
     // 初始化菜单项数组
     for (int i = 0; i < MAX_ITEMS; ++i) {
-        m_items[i].label = 0;
+        m_items[i].label = nullptr;
         m_items[i].stateId = 0;
     }
 }
