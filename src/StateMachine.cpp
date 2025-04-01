@@ -255,6 +255,10 @@ void StateMachine::setDisplayContext(DisplayContext* display) {
     m_displayContext = display;
 }
 
+DisplayContext* StateMachine::getDisplayContext() {
+    return m_displayContext;
+}
+
 void StateMachine::requestDisplayUpdate() {
     if (!m_displayContext) {
         return;

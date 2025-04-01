@@ -67,6 +67,8 @@ public:
     // 设置显示上下文
     void setDisplayContext(DisplayContext* display);
 
+    DisplayContext* getDisplayContext();
+
     // 请求更新显示
     void requestDisplayUpdate(); // NOTE: no use now
 };

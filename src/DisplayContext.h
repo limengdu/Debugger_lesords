@@ -4,20 +4,30 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include <TFT_eSPI.h>
+#include <SPI.h>
+#include "Free_Fonts.h"
+
 // 显示上下文，提供绘图API
 class DisplayContext {
 private:
     SemaphoreHandle_t m_displayMutex;
+    TFT_eSPI* m_tft;
     
 public:
     DisplayContext() {
         m_displayMutex = xSemaphoreCreateMutex();
+        m_tft = nullptr;
     }
     
     ~DisplayContext() {
         if (m_displayMutex) {
             vSemaphoreDelete(m_displayMutex);
         }
+    }
+
+    void setTft(TFT_eSPI* tft) {
+        m_tft = tft;
     }
     
     // 获取显示锁
@@ -49,10 +59,23 @@ public:
     void drawImage(int x, int y, const uint8_t* imageData, int width, int height) {
         // 实现图像绘制
     }
+
+    void drawText() {
+        m_tft->fillScreen(TFT_GREEN);
+    }
+
+    void drawRect() {
+        m_tft->fillScreen(TFT_BLUE);
+    }
+
+    void drawImage() {
+        m_tft->fillScreen(TFT_RED);
+    }
     
     // 刷新显示
     void refresh() {
         // 将显示缓冲推送到屏幕
+        m_tft->fillScreen(TFT_WHITE);
     }
 };
 

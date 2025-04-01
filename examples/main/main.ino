@@ -6,6 +6,10 @@
 #include "InputTask.h"
 #include "DisplayContext.h"
 
+#include <TFT_eSPI.h>
+#include <SPI.h>
+#include "Free_Fonts.h"
+
 // 创建显示上下文
 DisplayContext displayContext;
 
@@ -15,10 +19,19 @@ StateMachine stateMachine;
 // 创建输入任务
 InputTask inputTask;
 
+TFT_eSPI tft = TFT_eSPI();
+
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
     // 记录错误到日志
     // 也可以通过UART发送错误信息
+}
+
+void initLCD() {
+    tft.init();
+    tft.setRotation(1);
+    displayContext.setTft(&tft);
+    displayContext.refresh();
 }
 
 void setup() {
@@ -26,6 +39,7 @@ void setup() {
 
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
+    initLCD();
 
     // 注册状态
     StateManager* stateManager = StateManager::getInstance();
