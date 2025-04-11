@@ -6,6 +6,9 @@
 #include "InputTask.h"
 #include "DisplayContext.h"
 
+#include "DapLink.h"
+#include "Global.h"
+
 // 创建显示上下文
 DisplayContext displayContext;
 
@@ -26,6 +29,8 @@ void setup() {
 
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
+    initDapLink();
+    pinMode(BOOT_BTN, INPUT_PULLUP);
 
     // 注册状态
     StateManager* stateManager = StateManager::getInstance();

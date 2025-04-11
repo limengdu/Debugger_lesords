@@ -1,9 +1,10 @@
+#include "Global.h"
 #include "InputTask.h"
 #include "Event.h"
 
 #include <Arduino.h>
 
-#define INPUT_DEBUG
+// #define INPUT_DEBUG
 
 InputTask::InputTask() 
     : m_wheelTask(0), 
@@ -132,10 +133,11 @@ void InputTask::buttonTaskFunc(void* params) {
 #ifdef INPUT_DEBUG
         Serial.printf("[%s]::%d - for loop (Button)\n", __func__, __LINE__);
 #endif
-        bool buttonPressed = false;
+        bool buttonPressed = digitalRead(BOOT_BTN) == LOW;
         int buttonId = 0;
 
         if (buttonPressed) {
+            Serial.printf("[%s]::%d - (button) - button is Pressed\n", __func__, __LINE__);
             // 创建按钮按下事件
             ButtonEvent event(EVENT_BUTTON_PRESS, buttonId);
 
