@@ -232,11 +232,12 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
         return;
     }
 
+    Adafruit_INA228* ina228 = display->getINA228();
     char value[10];
     int baud_value = 9600;
-    float vol = 0;
-    float cur = 0;
-    float power = 0;
+    float vol = ina228->readBusVoltage() / 1000 / 1000;
+    float cur = ina228->readCurrent() / 1000;
+    float power = ina228->readPower() / 1000;
 
     lv_label_set_text_fmt(m_mainMenu.baud_value, "%d", baud_value);
 

@@ -3,6 +3,11 @@
 
 #define BOOT_BTN 0
 
+#define INA_I2C_SDA 4
+#define INA_I2C_SCL 3
+#define INA_I2C_ADDR 0x43
+#define INA_I2C_FREQUENCY 100000
+
 /*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES   240
 #define TFT_VER_RES   320

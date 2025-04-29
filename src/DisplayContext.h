@@ -4,6 +4,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include <Adafruit_INA228.h>
 #include <lvgl.h>
 
 #if LV_USE_TFT_ESPI
@@ -14,18 +15,27 @@
 class DisplayContext {
 private:
     SemaphoreHandle_t m_displayMutex;
-    
+    Adafruit_INA228* m_ina228;
+
 public:
     DisplayContext() {
         m_displayMutex = xSemaphoreCreateMutex();
     }
-    
+
     ~DisplayContext() {
         if (m_displayMutex) {
             vSemaphoreDelete(m_displayMutex);
         }
     }
-    
+
+    void setINA228(Adafruit_INA228* ina228) {
+        m_ina228 = ina228;
+    }
+
+    Adafruit_INA228* getINA228() {
+        return m_ina228;
+    }
+
     // 获取显示锁
     bool lock(TickType_t timeout = portMAX_DELAY) {
         return (xSemaphoreTake(m_displayMutex, timeout) == pdTRUE);

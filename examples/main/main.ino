@@ -10,6 +10,8 @@
 #include "Global.h"
 #include "LvglStyle.h"
 
+#include <Adafruit_INA228.h>
+
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
 uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
@@ -21,6 +23,8 @@ StateMachine stateMachine;
 
 // 创建输入任务
 InputTask inputTask;
+
+Adafruit_INA228 ina228;
 
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
@@ -50,6 +54,26 @@ void initLVGL() {
     lv_timer_handler();
 }
 
+void initINA228() {
+    ina228 = Adafruit_INA228();
+
+    Wire.setPins(INA_I2C_SDA, INA_I2C_SCL);
+    Wire.setClock(INA_I2C_FREQUENCY);
+
+    if (!ina228.begin(INA_I2C_ADDR)) {
+        Serial.println("Couldn't find INA228 chip");
+        return;
+    }
+
+    // set shunt resistance and max current
+    ina228.setShunt(0.068, 1.0);
+    ina228.setAveragingCount(INA228_COUNT_16);
+
+    // set the time over which to measure the current and bus voltage
+    ina228.setVoltageConversionTime(INA228_TIME_150_us);
+    ina228.setCurrentConversionTime(INA228_TIME_280_us);
+}
+
 void setup() {
     Serial.begin(9600);
 
@@ -58,6 +82,7 @@ void setup() {
     initLVGL();
     initStyle();
     initDapLink();
+    initINA228();
     pinMode(BOOT_BTN, INPUT_PULLUP);
 
     // 注册状态
@@ -81,6 +106,8 @@ void setup() {
 
     // 设置错误处理器
     stateMachine.setErrorHandler(appErrorHandler);
+
+    displayContext.setINA228(&ina228);
 
     // 设置显示上下文
     stateMachine.setDisplayContext(&displayContext);
