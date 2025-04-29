@@ -4,6 +4,12 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include <lvgl.h>
+
+#if LV_USE_TFT_ESPI
+#include <TFT_eSPI.h>
+#endif
+
 // 显示上下文，提供绘图API
 class DisplayContext {
 private:

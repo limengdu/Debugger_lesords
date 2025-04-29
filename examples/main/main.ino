@@ -8,6 +8,10 @@
 
 #include "DapLink.h"
 #include "Global.h"
+#include "LvglStyle.h"
+
+#define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
+uint32_t draw_buf[DRAW_BUF_SIZE / 4];
 
 // 创建显示上下文
 DisplayContext displayContext;
@@ -24,11 +28,35 @@ void appErrorHandler(int errorCode, const char* errorMsg) {
     // 也可以通过UART发送错误信息
 }
 
+static uint32_t my_tick(void) {
+    return millis();
+}
+
+void initLVGL() {
+    lv_init();
+
+    lv_tick_set_cb(my_tick);
+
+    lv_display_t* disp;
+    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+    lv_display_set_rotation(disp, TFT_ROTATION);
+
+    static lv_style_t style_screen;
+    lv_style_init(&style_screen);
+    lv_style_set_bg_color(&style_screen, lv_color_hex(0x000000));
+
+    lv_obj_add_style(lv_scr_act(), &style_screen, 0);
+
+    lv_timer_handler();
+}
+
 void setup() {
     Serial.begin(9600);
 
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
+    initLVGL();
+    initStyle();
     initDapLink();
     pinMode(BOOT_BTN, INPUT_PULLUP);
 
