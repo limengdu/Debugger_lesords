@@ -8,6 +8,7 @@
 #include "ErrorState.h"
 #include "FunctionUartState.h"
 #include "FunctionBaudState.h"
+#include "FunctionPowerState.h"
 
 #include "DapLink.h"
 #include "Global.h"
@@ -28,6 +29,8 @@ StateMachine stateMachine;
 InputTask inputTask;
 
 Adafruit_INA228 ina228;
+
+unsigned long startTime = 0;
 
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
@@ -78,6 +81,9 @@ void initINA228() {
 }
 
 void setup() {
+    // 记录程序启动时间
+    startTime = millis();
+
     Serial.begin(9600);
 
     // 硬件初始化
@@ -95,15 +101,17 @@ void setup() {
     MainMenuState* mainMenu = new MainMenuState();
     FunctionUartState* uartState = new FunctionUartState();
     FunctionBaudState* baudState = new FunctionBaudState();
+    FunctionPowerState* powerState = new FunctionPowerState();
     // 添加菜单项
     mainMenu->addMenuItem("Function 1", FunctionUartState::ID);
     mainMenu->addMenuItem("Function 2", FunctionBaudState::ID);
-    mainMenu->addMenuItem("Function 3", 4); // 假设Function3State的ID是4
+    mainMenu->addMenuItem("Function 3", FunctionPowerState::ID);
     stateManager->registerState(mainMenu);
 
     // 注册功能状态
     stateManager->registerState(uartState);
     stateManager->registerState(baudState);
+    stateManager->registerState(powerState);
     // TODO: 注册其他功能状态...
 
     // 创建错误状态

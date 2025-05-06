@@ -13,4 +13,12 @@
 #define TFT_VER_RES   320
 #define TFT_ROTATION  LV_DISPLAY_ROTATION_270
 
+#define DELETE_LABEL(label)   \
+if (label != nullptr) {   \
+lv_obj_del(label);     \
+label = nullptr;       \
+}
+
+extern unsigned long startTime;
+
 #endif
