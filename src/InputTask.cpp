@@ -9,7 +9,6 @@
 InputTask::InputTask() 
     : m_wheelTask(0), 
       m_buttonTask(0), 
-      m_touchTask(0),
       m_stateMachine(0)
 {
 }
@@ -26,7 +25,7 @@ bool InputTask::start(UBaseType_t priority) {
     if (!m_stateMachine) {
         return false;
     }
-    
+
     // 创建滚轮任务
     BaseType_t result = xTaskCreate(
         wheelTaskFunc,
@@ -36,11 +35,11 @@ bool InputTask::start(UBaseType_t priority) {
         priority,
         &m_wheelTask
     );
-    
+
     if (result != pdPASS) {
         return false;
     }
-    
+
     // 创建按钮任务
     result = xTaskCreate(
         buttonTaskFunc,
@@ -50,23 +49,13 @@ bool InputTask::start(UBaseType_t priority) {
         priority,
         &m_buttonTask
     );
-    
+
     if (result != pdPASS) {
         vTaskDelete(m_wheelTask);
         m_wheelTask = 0;
         return false;
     }
-    
-    // 创建触摸屏任务
-    result = xTaskCreate(
-        touchTaskFunc,
-        "TouchTask",
-        4096,
-        this,
-        priority,
-        &m_touchTask
-    );
-    
+
     if (result != pdPASS) {
         vTaskDelete(m_wheelTask);
         vTaskDelete(m_buttonTask);
@@ -74,7 +63,7 @@ bool InputTask::start(UBaseType_t priority) {
         m_buttonTask = 0;
         return false;
     }
-    
+
     return true;
 }
 
@@ -83,15 +72,10 @@ void InputTask::stop() {
         vTaskDelete(m_wheelTask);
         m_wheelTask = 0;
     }
-    
+
     if (m_buttonTask) {
         vTaskDelete(m_buttonTask);
         m_buttonTask = 0;
-    }
-    
-    if (m_touchTask) {
-        vTaskDelete(m_touchTask);
-        m_touchTask = 0;
     }
 }
 
@@ -146,34 +130,6 @@ void InputTask::buttonTaskFunc(void* params) {
         }
 
         // 按钮检测延迟
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-
-void InputTask::touchTaskFunc(void* params) {
-    InputTask* inputTask = static_cast<InputTask*>(params);
-    StateMachine* stateMachine = inputTask->m_stateMachine;
-
-    for (;;) {
-        // 轮询触摸屏
-        // TODO: 实现触摸屏状态检测
-
-#ifdef INPUT_DEBUG
-        Serial.printf("[%s]::%d - for loop (Touch)\n", __func__, __LINE__);
-#endif
-        bool touchActive = false;
-        int touchX = 0;
-        int touchY = 0;
-
-        if (touchActive) {
-            // 创建触摸事件
-            TouchEvent event(EVENT_TOUCH_PRESS, touchX, touchY);
-            
-            // 发送事件到状态机
-            stateMachine->postEvent(&event);
-        }
-
-        // 触摸屏检测延迟
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

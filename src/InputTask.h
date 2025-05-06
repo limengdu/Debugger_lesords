@@ -9,12 +9,10 @@ class InputTask {
 private:
     TaskHandle_t m_wheelTask;
     TaskHandle_t m_buttonTask;
-    TaskHandle_t m_touchTask;
     StateMachine* m_stateMachine;
     
     static void wheelTaskFunc(void* params);
     static void buttonTaskFunc(void* params);
-    static void touchTaskFunc(void* params);
     
 public:
     InputTask();
