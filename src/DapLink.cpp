@@ -43,7 +43,7 @@ uint8_t rawhidResponse[DAP_PACKET_SIZE];
 #define FREE_COUNT_INIT          (DAP_PACKET_COUNT)
 #define SEND_COUNT_INIT          0
 
-void initDapLink() {
+void initDapLink(bool blocked) {
     USBDevice.setProductDescriptor("CMSIS-DAP");
     USBDevice.setID(0x0D28,0x0204);
 
@@ -70,8 +70,10 @@ void initDapLink() {
         USBDevice.attach();
     }
 
-    // wait until device mounted
-    while( !USBDevice.mounted() ) delay(1);
+    if (blocked) {
+        // wait until device mounted
+        while( !USBDevice.mounted() ) delay(1);
+    }
 
     DAP_Setup();
 
