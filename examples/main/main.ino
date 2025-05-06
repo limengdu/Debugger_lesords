@@ -5,6 +5,7 @@
 #include "MenuStates.h"
 #include "InputTask.h"
 #include "DisplayContext.h"
+#include "ErrorState.h"
 
 #include "DapLink.h"
 #include "Global.h"

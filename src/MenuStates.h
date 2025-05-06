@@ -74,25 +74,5 @@ public:
     virtual const char* getName() const { return "Function1"; }
 };
 
-// 错误状态
-class ErrorState : public State {
-private:
-    int m_errorCode;
-    const char* m_errorMessage;
-    
-public:
-    enum { ID = 0 };
-    
-    ErrorState();
-    
-    void setError(int code, const char* message);
-    
-    // 实现State接口
-    virtual void onEnter();
-    virtual bool handleEvent(StateMachine* machine, const Event* event);
-    virtual void updateDisplay(DisplayContext* display);
-    virtual int getID() const { return ID; }
-    virtual const char* getName() const { return "Error"; }
-};
 
 #endif // MENU_STATES_H
