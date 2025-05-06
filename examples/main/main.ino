@@ -6,6 +6,7 @@
 #include "InputTask.h"
 #include "DisplayContext.h"
 #include "ErrorState.h"
+#include "FunctionUartState.h"
 
 #include "DapLink.h"
 #include "Global.h"
@@ -91,8 +92,9 @@ void setup() {
 
     // 创建并注册主菜单状态
     MainMenuState* mainMenu = new MainMenuState();
+    FunctionUartState* uartState = new FunctionUartState();
     // 添加菜单项
-    mainMenu->addMenuItem("Function 1", Function1State::ID);
+    mainMenu->addMenuItem("Function 1", FunctionUartState::ID);
     mainMenu->addMenuItem("Function 2", 3); // 假设Function2State的ID是3
     mainMenu->addMenuItem("Function 3", 4); // 假设Function3State的ID是4
     stateManager->registerState(mainMenu);
@@ -114,7 +116,7 @@ void setup() {
     stateMachine.setDisplayContext(&displayContext);
 
     // 初始化状态机，以主菜单为初始状态，错误状态为异常处理状态
-    if (!stateMachine.init(mainMenu, errorState)) {
+    if (!stateMachine.init(uartState, errorState)) {
         // 初始化失败处理
         while(1); // 或者重启系统
     }
