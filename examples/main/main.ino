@@ -7,6 +7,7 @@
 #include "DisplayContext.h"
 #include "ErrorState.h"
 #include "FunctionUartState.h"
+#include "FunctionBaudState.h"
 
 #include "DapLink.h"
 #include "Global.h"
@@ -93,14 +94,16 @@ void setup() {
     // 创建并注册主菜单状态
     MainMenuState* mainMenu = new MainMenuState();
     FunctionUartState* uartState = new FunctionUartState();
+    FunctionBaudState* baudState = new FunctionBaudState();
     // 添加菜单项
     mainMenu->addMenuItem("Function 1", FunctionUartState::ID);
-    mainMenu->addMenuItem("Function 2", 3); // 假设Function2State的ID是3
+    mainMenu->addMenuItem("Function 2", FunctionBaudState::ID);
     mainMenu->addMenuItem("Function 3", 4); // 假设Function3State的ID是4
     stateManager->registerState(mainMenu);
 
     // 注册功能状态
-    stateManager->registerState(new Function1State());
+    stateManager->registerState(uartState);
+    stateManager->registerState(baudState);
     // TODO: 注册其他功能状态...
 
     // 创建错误状态
