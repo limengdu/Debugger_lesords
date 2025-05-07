@@ -14,6 +14,7 @@ FunctionPowerState::FunctionPowerState()
 , m_totalPower(0.0)
 , currentInterfaceIndex(0)
 , startTime(0)
+,m_isFirstFlag(false)
 {
     // 初始化界面函数数组
     interfaceFunctions[0] = &FunctionPowerState::powerInterface_1;
@@ -89,12 +90,48 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
     }
 }
 
+// 计算
+void FunctionPowerState::compute(float vol, float cur, float pow)
+{
+    m_voltage = vol;
+    m_current = cur; // 单位 A
+    m_power = pow; // 单位 w
+
+    if (!m_isFirstFlag) { // 第一次记录
+        m_minCurrent = m_current;
+        m_maxCurrent = m_current;
+        m_minPower = m_power;
+        m_maxPower = m_power;
+        m_totalCurrent = m_current * m_timeInterval; // 第一次计算总电流（Ah）
+        m_totalPower = m_power * m_timeInterval; // 第一次计算总功率（Wh）
+        m_isFirstFlag = true;
+    } else {
+        if (m_current < m_minCurrent) {
+            m_minCurrent = m_current;
+        }
+        if (m_current > m_maxCurrent) {
+            m_maxCurrent = m_current;
+        }
+        m_totalCurrent += m_current * m_timeInterval; // 累加总电流（Ah）
+
+        if (m_power < m_minPower) {
+            m_minPower = m_power;
+        }
+        if (m_power > m_maxPower) {
+            m_maxPower = m_power;
+        }
+        m_totalPower += m_power * m_timeInterval; // 累加总功率（Wh）
+    }
+}
+
 void FunctionPowerState::updateDisplay(DisplayContext* display)
 {
     if (!display) {
         return;
     }
 
+    Adafruit_INA228* ina228 = display->getINA228();
+    compute(ina228->readBusVoltage()/1000/1000, ina228->readCurrent()/1000, ina228->readPower()/1000);
     char buff[16];
     switch (currentInterfaceIndex){
         case POWER_INTERFACE_1:{
@@ -165,7 +202,7 @@ void FunctionPowerState::powerInterface_1()
     // 电流
     sprintf(buf, "I %.4f A", m_current);
     lv_label_set_text(m_powerStateUI.currentLabel_A, buf);
-    lv_obj_set_pos(m_powerStateUI.currentLabel_A, 42+7, 94);
+    lv_obj_set_pos(m_powerStateUI.currentLabel_A, 42, 94);
     lv_obj_set_style_text_color(m_powerStateUI.currentLabel_A, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(m_powerStateUI.currentLabel_A, &style_font_36, 0);
 
@@ -191,19 +228,19 @@ void FunctionPowerState::powerInterface_2()
     // 电流
     sprintf(buf, "I %.4f A", m_current);
     lv_label_set_text(m_powerStateUI.currentLabel_A, buf);
-    lv_obj_set_pos(m_powerStateUI.currentLabel_A, 48, 70);
+    lv_obj_set_pos(m_powerStateUI.currentLabel_A, 42, 70);
     lv_obj_set_style_text_color(m_powerStateUI.currentLabel_A, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(m_powerStateUI.currentLabel_A, &style_font_22, 0);
 
     sprintf(buf, " %.4f mA", m_current*1000);
     lv_label_set_text(m_powerStateUI.currentLabel_mA, buf);
-    lv_obj_set_pos(m_powerStateUI.currentLabel_mA, 58, 100);
+    lv_obj_set_pos(m_powerStateUI.currentLabel_mA, 52, 100);
     lv_obj_set_style_text_color(m_powerStateUI.currentLabel_mA, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(m_powerStateUI.currentLabel_mA, &style_font_22, 0);
 
     sprintf(buf, " %.1f uA", m_current*1000000);
     lv_label_set_text(m_powerStateUI.currentLabel_uA, buf);
-    lv_obj_set_pos(m_powerStateUI.currentLabel_uA, 58, 130);
+    lv_obj_set_pos(m_powerStateUI.currentLabel_uA, 52, 130);
     lv_obj_set_style_text_color(m_powerStateUI.currentLabel_uA, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(m_powerStateUI.currentLabel_uA, &style_font_22, 0);
 

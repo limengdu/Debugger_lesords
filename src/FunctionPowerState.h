@@ -49,6 +49,7 @@ public:
     const char* getName() const override;
     bool handleEvent(StateMachine* machine, const Event* event) override;
 
+    void compute(float vol,float cur,float pow);
     void powerInterface_1();
     void powerInterface_2();
     void powerInterface_3();
@@ -58,6 +59,9 @@ public:
 private:
     // lv_obj_t *m_titleLabel;
     PowerStateUI m_powerStateUI;
+    bool m_isFirstFlag;
+    // 100ms 转换为小时，因为 updateDisplay() 每隔 100ms 刷新一次
+    static constexpr float m_timeInterval = 1.0f / 36000.0f;
     //电压
     float m_voltage;
     //电流
