@@ -3,6 +3,7 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "Global.h"
 
 #include <Adafruit_INA228.h>
 #include <lvgl.h>
@@ -34,6 +35,23 @@ public:
 
     Adafruit_INA228* getINA228() {
         return m_ina228;
+    }
+
+    void updateBaudLED(int baudIndex) {
+        byte dataA = 0B00000001, dataB = 0B10000100;
+
+        if (baudIndex <= 6) {
+            dataA |= 2 << baudIndex;
+        } else {
+            dataB |= 1 << (baudIndex - 7);
+        }
+
+        digitalWrite(LED_LATCH, LOW);
+
+        shiftOut(LED_DATA, LED_CLOCK, MSBFIRST, dataB);
+        shiftOut(LED_DATA, LED_CLOCK, MSBFIRST, dataA);
+
+        digitalWrite(LED_LATCH, HIGH);
     }
 
     // 获取显示锁

@@ -7,6 +7,10 @@
 #define COMSerial   Serial0
 #define UART_SWITCH 48
 
+#define LED_DATA    9
+#define LED_CLOCK   7
+#define LED_LATCH   8
+
 #define INA_I2C_SDA 4
 #define INA_I2C_SCL 3
 #define INA_I2C_ADDR 0x43

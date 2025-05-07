@@ -48,6 +48,21 @@ void initSerial() {
     digitalWrite(UART_SWITCH, LOW);
 }
 
+void initLED() {
+    byte dataA = 0B00000101, dataB = 0B10000100;
+
+    pinMode(LED_DATA, OUTPUT);
+    pinMode(LED_CLOCK, OUTPUT);
+    pinMode(LED_LATCH, OUTPUT);
+
+    digitalWrite(LED_LATCH, LOW);
+
+    shiftOut(LED_DATA, LED_CLOCK, MSBFIRST, dataB);
+    shiftOut(LED_DATA, LED_CLOCK, MSBFIRST, dataA);
+
+    digitalWrite(LED_LATCH, HIGH);
+}
+
 void initLVGL() {
     lv_init();
 
@@ -90,6 +105,7 @@ void setup() {
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
     initSerial();
+    initLED();
     initLVGL();
     initStyle();
     initDapLink();
