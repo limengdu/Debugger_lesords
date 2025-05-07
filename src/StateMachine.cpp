@@ -112,6 +112,10 @@ void StateMachine::stateMachineTaskFunc(void* params) {
             machine->handleEvent(event);
         }
 
+        if (machine->m_displayContext) {
+            machine->m_currentState->updateDisplay(machine->m_displayContext);
+        }
+
         lv_timer_handler(); /* let the GUI do its work */
 
         vTaskDelay(pdMS_TO_TICKS(100));
