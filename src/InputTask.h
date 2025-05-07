@@ -5,6 +5,14 @@
 #include "task.h"
 #include "StateMachine.h"
 
+// 枚举按键动作
+enum ButtonAction {
+    NoneAction,
+    ButtonRelease,
+    ButtonShortPress,
+    ButtonLongPress
+};
+
 class InputTask {
 private:
     TaskHandle_t m_wheelTask;
@@ -13,6 +21,9 @@ private:
     
     static void wheelTaskFunc(void* params);
     static void buttonTaskFunc(void* params);
+
+public:
+    static ButtonAction m_buttonAction;
     
 public:
     InputTask();
@@ -26,6 +37,9 @@ public:
     
     // 停止输入任务
     void stop();
+
+    //按钮中断处理函数
+    static void btnInterruptHandler(void);
 };
 
 #endif // INPUT_TASK_H

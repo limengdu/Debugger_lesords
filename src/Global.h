@@ -13,6 +13,9 @@
 #define TFT_VER_RES   320
 #define TFT_ROTATION  LV_DISPLAY_ROTATION_270
 
+#define DEBOUNCE_DELAT 50       // Debounce delay, in milliseconds
+#define LONG_PRESS_DELAY 1000   // Long press delay, in milliseconds
+
 #define DELETE_LABEL(label)   \
 if (label != nullptr) {   \
 lv_obj_del(label);     \
