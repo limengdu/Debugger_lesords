@@ -80,7 +80,7 @@ void InputTask::wheelTaskFunc(void* params) {
         // TODO: 实现滚轮状态检测
 
 #ifdef INPUT_DEBUG
-        Serial.printf("[%s]::%d - for loop (Wheel)\n", __func__, __LINE__);
+        ShowSerial.printf("[%s]::%d - for loop (Wheel)\n", __func__, __LINE__);
 #endif
         bool wheelMoved = false;
         bool isClockwise = true;

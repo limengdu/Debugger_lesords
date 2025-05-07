@@ -1,10 +1,35 @@
 #include "FunctionUartState.h"
 
 FunctionUartState::FunctionUartState()
-: FunctionState("FunctionUartState")
-, m_uartType(UartType::UART_TYPE_XIAO)
-, m_uartStateUI()
+    : FunctionState("FunctionUartState"),
+      m_uartType(UartType::UART_TYPE_XIAO),
+      m_uartStateUI(),
+      m_uartTask(nullptr)
 {
+    xTaskCreate(
+        uartTaskFunc,
+        "UartTask",
+        20480,
+        this,
+        2,
+        &m_uartTask
+    );
+}
+
+void FunctionUartState::uartTaskFunc(void* params) {
+    while (true) {
+        if (COMSerial.available()) {
+            char c = COMSerial.read();
+            ShowSerial.write(c);
+        }
+
+        if (ShowSerial.available()) {
+            char c = ShowSerial.read();
+            COMSerial.write(c);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
 }
 
 void FunctionUartState::onEnter()
@@ -159,7 +184,9 @@ void FunctionUartState::changeUartType()
 {
     if(m_uartType == UartType::UART_TYPE_XIAO){
         m_uartType = UartType::UART_TYPE_Grove;
+        digitalWrite(UART_SWITCH, HIGH);
     }else{
         m_uartType = UartType::UART_TYPE_XIAO;
+        digitalWrite(UART_SWITCH, LOW);
     }
 }

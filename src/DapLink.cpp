@@ -1,4 +1,5 @@
 #include "DapLink.h"
+#include "Global.h"
 
 #include <stdint.h>
 
@@ -60,11 +61,11 @@ void initDapLink(bool blocked) {
 
     int ret = usb_hid.begin();
     if (!ret) {
-        Serial.println("usb hid begin failed");
+        ShowSerial.println("usb hid begin failed");
     }
 
     if (USBDevice.mounted()) {
-        Serial.println("DAPLink reattach");
+        ShowSerial.println("DAPLink reattach");
         USBDevice.detach();
         delay(10);
         USBDevice.attach();

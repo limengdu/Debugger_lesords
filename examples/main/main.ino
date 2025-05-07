@@ -40,6 +40,14 @@ static uint32_t my_tick(void) {
     return millis();
 }
 
+void initSerial() {
+    ShowSerial.begin(9600);
+    COMSerial.begin(9600);
+
+    pinMode(UART_SWITCH, OUTPUT);
+    digitalWrite(UART_SWITCH, LOW);
+}
+
 void initLVGL() {
     lv_init();
 
@@ -65,7 +73,7 @@ void initINA228() {
     Wire.setClock(INA_I2C_FREQUENCY);
 
     if (!ina228.begin(INA_I2C_ADDR)) {
-        Serial.println("Couldn't find INA228 chip");
+        ShowSerial.println("Couldn't find INA228 chip");
         return;
     }
 
@@ -79,10 +87,9 @@ void initINA228() {
 }
 
 void setup() {
-    Serial.begin(9600);
-
     // 硬件初始化
     // TODO: 初始化MCU外设、显示屏等
+    initSerial();
     initLVGL();
     initStyle();
     initDapLink();
@@ -142,7 +149,7 @@ void setup() {
         while(1);
     }
 
-    Serial.printf("All settings are successful\n");
+    ShowSerial.printf("All settings are successful\n");
 }
 
 void loop()

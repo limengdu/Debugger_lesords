@@ -3,6 +3,10 @@
 
 #define BOOT_BTN 0
 
+#define ShowSerial  Serial
+#define COMSerial   Serial0
+#define UART_SWITCH 48
+
 #define INA_I2C_SDA 4
 #define INA_I2C_SCL 3
 #define INA_I2C_ADDR 0x43

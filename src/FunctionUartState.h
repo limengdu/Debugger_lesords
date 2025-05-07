@@ -28,6 +28,17 @@ enum UartType{
 
 // 特定功能状态
 class FunctionUartState : public FunctionState {
+private:
+    UartType m_uartType;
+    UartStateUI m_uartStateUI;
+    TaskHandle_t m_uartTask;
+
+    static void uartTaskFunc(void* params);
+
+public:
+    char m_rxBuff[20] = "";
+    char m_txBuff[20] = "";
+
 public:
     enum { ID = 2 };
 
@@ -41,13 +52,6 @@ public:
 
     void changeUartType();
     virtual bool handleEvent(StateMachine* machine, const Event* event);
-
-public:
-    char m_rxBuff[20] = "";
-    char m_txBuff[20] = "";
-private:
-    UartType m_uartType;
-    UartStateUI m_uartStateUI;
 };
 
 #endif //FUNCTIONUARTSTATE_H
