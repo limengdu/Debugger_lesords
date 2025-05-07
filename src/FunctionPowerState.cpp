@@ -19,6 +19,7 @@ FunctionPowerState::FunctionPowerState()
 , m_maxPower(0.0)
 , m_totalPower(0.0)
 , currentInterfaceIndex(0)
+, startTime(0)
 {
     // 初始化界面函数数组
     interfaceFunctions[0] = &FunctionPowerState::powerInterface_1;
@@ -28,6 +29,10 @@ FunctionPowerState::FunctionPowerState()
 
 void FunctionPowerState::onEnter()
 {
+    // 记录第一次进来的时间
+    if ( startTime == 0 ){
+        startTime = millis();
+    }
     if (m_powerStateUI.Screen != nullptr) {
         if ( lv_scr_act() != m_powerStateUI.Screen) {
             lv_scr_load(m_powerStateUI.Screen);
@@ -98,7 +103,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
     char buff[16];
     switch (currentInterfaceIndex){
-        case 0:{
+        case POWER_INTERFACE_1:{
             sprintf(buff, "U %.4f v", m_voltage);
             lv_label_set_text(m_powerStateUI.voltageLabel_V, buff);
             sprintf(buff, "I  %.4f A", m_current);
@@ -107,7 +112,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lv_label_set_text(m_powerStateUI.powerLabel_W, buff);
             break;
         }
-        case 1:{
+        case POWER_INTERFACE_2:{
             sprintf(buff, "U %.4f v", m_voltage);
             lv_label_set_text(m_powerStateUI.voltageLabel_V, buff);
             sprintf(buff, "I  %.4f A", m_current);
@@ -122,7 +127,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lv_label_set_text(m_powerStateUI.powerLabel_mW, buff);
             break;
         }
-        case 2:{
+        case POWER_INTERFACE_3:{
             sprintf(buff, " %.4f Ah", m_totalCurrent);
             lv_label_set_text(m_powerStateUI.totalLabel_Ah, buff);
             sprintf(buff, " %.4f wh", m_totalPower);

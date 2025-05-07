@@ -30,7 +30,7 @@ InputTask inputTask;
 
 Adafruit_INA228 ina228;
 
-unsigned long startTime = 0;
+
 
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
@@ -81,9 +81,6 @@ void initINA228() {
 }
 
 void setup() {
-    // 记录程序启动时间
-    startTime = millis();
-
     Serial.begin(9600);
 
     // 硬件初始化

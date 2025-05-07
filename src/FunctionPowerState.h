@@ -10,6 +10,10 @@
 #include "MenuStates.h"
 #include "FunctionUartState.h"
 
+#define POWER_INTERFACE_1  0
+#define POWER_INTERFACE_2  1
+#define POWER_INTERFACE_3  2
+
 struct PowerStateUI {
     lv_obj_t* Screen;
 
@@ -75,6 +79,7 @@ private:
     // 界面数组
     InterfaceFunction interfaceFunctions[3];
     int currentInterfaceIndex;
+    unsigned long startTime;
 };
 
 
