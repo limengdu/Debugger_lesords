@@ -4,7 +4,9 @@ FunctionUartState::FunctionUartState()
     : FunctionState("FunctionUartState"),
       m_uartType(UartType::UART_TYPE_XIAO),
       m_uartStateUI(),
-      m_uartTask(nullptr)
+      m_uartTask(nullptr),
+      m_rxBuff(""),
+      m_txBuff("")
 {
     xTaskCreate(
         uartTaskFunc,
@@ -116,11 +118,21 @@ void FunctionUartState::onEnter()
     lv_led_set_color(led_TX, lv_color_hex(0x2FE6AC));
     lv_obj_add_style(led_TX, &style_led, 0);
 
+    // rx 显示的标签
+    lv_obj_set_pos(m_uartStateUI.UartRxLabel, 5, 5);
+    lv_obj_set_style_text_color(m_uartStateUI.UartRxLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_add_style(m_uartStateUI.UartRxLabel, &style_font_18, 0);
+    // tx 显示的标签
+    lv_obj_set_pos(m_uartStateUI.UartTxLabel, 5, 5);
+    lv_obj_set_style_text_color(m_uartStateUI.UartTxLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_add_style(m_uartStateUI.UartTxLabel, &style_font_18, 0);
+
     lv_scr_load(m_uartStateUI.Screen);
 }
 
 void FunctionUartState::onExit()
 {
+
 }
 
 bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
@@ -166,6 +178,7 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
     lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO)? "XIAO" : "Grove");
     lv_label_set_text_fmt(m_uartStateUI.UartBaudLabel, "%d", FunctionBaudState::m_baudRate);
 
+    // 更新标签文本
     lv_label_set_text(m_uartStateUI.UartRxLabel, m_rxBuff);
     lv_label_set_text(m_uartStateUI.UartTxLabel, m_txBuff);
 }
@@ -182,6 +195,9 @@ const char* FunctionUartState::getName() const
 
 void FunctionUartState::changeUartType()
 {
+    // 实现具体串口切换，现在只是界面有变化
+    //...
+
     if(m_uartType == UartType::UART_TYPE_XIAO){
         m_uartType = UartType::UART_TYPE_Grove;
         digitalWrite(UART_SWITCH, HIGH);
@@ -189,4 +205,5 @@ void FunctionUartState::changeUartType()
         m_uartType = UartType::UART_TYPE_XIAO;
         digitalWrite(UART_SWITCH, LOW);
     }
+
 }

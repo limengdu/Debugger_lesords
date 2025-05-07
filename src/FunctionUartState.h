@@ -7,6 +7,9 @@
 #include "StateManager.h"
 #include "FunctionBaudState.h"
 
+#define UART_DATA_SIZE 20
+
+
 struct UartStateUI {
     lv_obj_t* Screen;
     lv_obj_t* UartTypeBg;
@@ -36,8 +39,8 @@ private:
     static void uartTaskFunc(void* params);
 
 public:
-    char m_rxBuff[20] = "";
-    char m_txBuff[20] = "";
+    char m_rxBuff[UART_DATA_SIZE];
+    char m_txBuff[UART_DATA_SIZE];
 
 public:
     enum { ID = 2 };
@@ -53,5 +56,6 @@ public:
     void changeUartType();
     virtual bool handleEvent(StateMachine* machine, const Event* event);
 };
+
 
 #endif //FUNCTIONUARTSTATE_H
