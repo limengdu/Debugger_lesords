@@ -20,14 +20,14 @@ void FunctionBaudState::onEnter()
 
     m_baudStateUI.Line = lv_line_create(m_baudStateUI.Screen);
     // 获取屏幕的高度和宽度
-    lv_coord_t screen_width = lv_disp_get_hor_res(NULL);
-    lv_coord_t screen_height = lv_disp_get_ver_res(NULL);
+    m_screenWidth = lv_disp_get_hor_res(NULL);
+    m_screenHeight = lv_disp_get_ver_res(NULL);
     // 计算水平居中时线的 y 坐标
-    lv_coord_t center_y = screen_height / 2;
+    lv_coord_t center_y = m_screenHeight / 2;
     // 定义线的两个端点
     static lv_point_precise_t line_points[] = {
         {0, center_y},
-        {screen_width, center_y}
+        {m_screenWidth, center_y}
     };
     // 设置线的端点
     lv_line_set_points(m_baudStateUI.Line, line_points, 2);
@@ -40,29 +40,47 @@ void FunctionBaudState::onEnter()
     m_baudStateUI.previousBaudLabel = lv_label_create(m_baudStateUI.Screen);
 
     char buf[16];
-    sprintf(buf, "%d", m_baudRateList[m_currentBaudIndex]);
-    lv_label_set_text(m_baudStateUI.currentBaudLabel, buf);
-    lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (screen_width/2 - 20), (screen_height/2-30));
-    lv_obj_set_style_text_color(m_baudStateUI.currentBaudLabel, lv_color_hex(0xDDE62F), LV_PART_MAIN);
-    lv_obj_add_style(m_baudStateUI.currentBaudLabel, &style_font_22, 0);
-
+    // 上一个波特率
     uint8_t prevBaudIndex = m_currentBaudIndex - 1;
-    if(prevBaudIndex < 0){
+    if (prevBaudIndex < 0){
         m_currentBaudIndex = sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) ;
     }
     sprintf(buf, "%d", m_baudRateList[prevBaudIndex]);
     lv_label_set_text(m_baudStateUI.previousBaudLabel, buf);
-    lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (screen_height/2+10));
+    // 根据索引奇偶性设置位置
+    if (prevBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2-25));
+    }
     lv_obj_set_style_text_color(m_baudStateUI.previousBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_baudStateUI.previousBaudLabel, &style_font_22, 0);
 
+    // 当前波特率
+    sprintf(buf, "%d", m_baudRateList[m_currentBaudIndex]);
+    lv_label_set_text(m_baudStateUI.currentBaudLabel, buf);
+    // 根据索引奇偶性设置位置
+    if (m_currentBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2-25));
+    }
+    lv_obj_set_style_text_color(m_baudStateUI.currentBaudLabel, lv_color_hex(0xDDE62F), LV_PART_MAIN);
+    lv_obj_add_style(m_baudStateUI.currentBaudLabel, &style_font_22, 0);
+
+    // 下一个波特率
     uint8_t nextBaudIndex = m_currentBaudIndex + 1;
-    if(nextBaudIndex >= sizeof(m_baudRateList) / sizeof(m_baudRateList[0])){
+    if (nextBaudIndex >= sizeof(m_baudRateList) / sizeof(m_baudRateList[0])){
         nextBaudIndex = 0;
     }
     sprintf(buf, "%d", m_baudRateList[nextBaudIndex]);
     lv_label_set_text(m_baudStateUI.nextBaudLabel, buf);
-    lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (screen_width - 100), (screen_height/2+10));
+    // 根据索引奇偶性设置位置
+    if (nextBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2-25));
+    }
     lv_obj_set_style_text_color(m_baudStateUI.nextBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_baudStateUI.nextBaudLabel, &style_font_22, 0);
 
@@ -93,7 +111,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             // 按钮按下，进入选中的功能
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
             if (buttonEvent->getButtonId() == 0) {
-                increaceBaudRate();// 测试波特率增加没有
+                increaceBaudIndex();// 测试波特率界面有没有变化
                 int stateId = FunctionPowerState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
@@ -115,36 +133,54 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
     }
 
     char buf[16];
+    if (m_currentBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2-25));
+    }
     sprintf(buf, "%d", m_baudRateList[m_currentBaudIndex]);
     lv_label_set_text(m_baudStateUI.currentBaudLabel, buf);
 
     // Correctly calculate the previous baud index
     uint8_t prevBaudIndex = (m_currentBaudIndex == 0) ? (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1) : m_currentBaudIndex - 1;
+    if (prevBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2-25));
+    }
     sprintf(buf, "%d", m_baudRateList[prevBaudIndex]);
     lv_label_set_text(m_baudStateUI.previousBaudLabel, buf);
 
     // Correctly calculate the next baud index
     uint8_t nextBaudIndex = (m_currentBaudIndex == (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1)) ? 0 : m_currentBaudIndex + 1;
+    if (nextBaudIndex % 2 == 0) {
+        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2+5));
+    } else {
+        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2-25));
+    }
     sprintf(buf, "%d", m_baudRateList[nextBaudIndex]);
     lv_label_set_text(m_baudStateUI.nextBaudLabel, buf);
 }
 
-void FunctionBaudState::increaceBaudRate()
+void FunctionBaudState::increaceBaudIndex()
 {
     uint8_t nextBaudIndex = (m_currentBaudIndex == (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1)) ? 0 : m_currentBaudIndex + 1;
     m_currentBaudIndex = nextBaudIndex;
-    m_baudRate = m_baudRateList[m_currentBaudIndex];
-
-    //具体修改串口波特率，这里只是修改界面
 }
 
-void FunctionBaudState::decreaceBaudRate()
+void FunctionBaudState::decreaceBaudIndex()
 {
     uint8_t prevBaudIndex = (m_currentBaudIndex == 0) ? (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1) : m_currentBaudIndex - 1;
     m_currentBaudIndex = prevBaudIndex;
-    m_baudRate = m_baudRateList[m_currentBaudIndex];
+}
 
-    //具体修改串口波特率，这里只是修改界面
+void FunctionBaudState::updateBaudRate()
+{
+    // todo 这里要具体设置波特率，根据当前索引拿到波特率
+    if (m_currentBaudIndex == (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1)){
+        return;
+    }
+    m_baudRate = m_baudRateList[m_currentBaudIndex];
 }
 
 int FunctionBaudState::getID() const
@@ -157,4 +193,4 @@ const char* FunctionBaudState::getName() const
     return "FunctionBaudState";
 }
 
-uint FunctionBaudState::m_baudRate = BAUD_9600;
+uint FunctionBaudState::m_baudRate = 9600;

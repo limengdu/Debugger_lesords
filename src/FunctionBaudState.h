@@ -7,16 +7,6 @@
 #include "StateManager.h"
 #include "FunctionPowerState.h"
 
-#define BAUD_4800 4800
-#define BAUD_9600 9600
-#define BAUD_19200 19200
-#define BAUD_38400 38400
-#define BAUD_57600 57600
-#define BAUD_115200 115200
-#define BAUD_230400 230400
-#define BAUD_460800 460800
-#define BAUD_921600 921600
-
 struct BaudStateUI {
     lv_obj_t* Screen;
     lv_obj_t* Line;
@@ -40,15 +30,20 @@ public:
     void onExit() override;
     bool handleEvent(StateMachine* machine, const Event* event) override;
 
-    void increaceBaudRate();
-    void decreaceBaudRate();
+    void increaceBaudIndex();
+    void decreaceBaudIndex();
+    void updateBaudRate();
 
 public:
     static uint m_baudRate;
 private:
     BaudStateUI m_baudStateUI;
-    uint m_baudRateList[9] = {BAUD_4800, BAUD_9600, BAUD_19200, BAUD_38400, BAUD_57600, BAUD_115200, BAUD_230400, BAUD_460800, BAUD_921600};
+    //设置10个元素，有一个是0
+    //如果只有9个元素，当前 index为0，前一个index为8，那么久判断后就在同一侧了
+    uint m_baudRateList[10] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600,0};
     uint8_t m_currentBaudIndex;
+    lv_coord_t m_screenWidth;
+    lv_coord_t m_screenHeight;
 };
 
 #endif //FUNCTIONBAUDSTATE_H
