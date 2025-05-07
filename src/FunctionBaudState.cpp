@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #include "FunctionBaudState.h"
 
 FunctionBaudState::FunctionBaudState()
@@ -161,6 +157,4 @@ const char* FunctionBaudState::getName() const
     return "FunctionBaudState";
 }
 
-
 uint FunctionBaudState::m_baudRate = BAUD_9600;
-

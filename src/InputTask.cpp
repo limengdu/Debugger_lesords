@@ -56,14 +56,6 @@ bool InputTask::start(UBaseType_t priority) {
         return false;
     }
 
-    if (result != pdPASS) {
-        vTaskDelete(m_wheelTask);
-        vTaskDelete(m_buttonTask);
-        m_wheelTask = 0;
-        m_buttonTask = 0;
-        return false;
-    }
-
     return true;
 }
 

@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #include "FunctionUartState.h"
 
 FunctionUartState::FunctionUartState()
@@ -9,7 +5,6 @@ FunctionUartState::FunctionUartState()
 , m_uartType(UartType::UART_TYPE_XIAO)
 , m_uartStateUI()
 {
-
 }
 
 void FunctionUartState::onEnter()
@@ -101,7 +96,6 @@ void FunctionUartState::onEnter()
 
 void FunctionUartState::onExit()
 {
-
 }
 
 bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
@@ -139,7 +133,6 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
     }
 }
 
-// Function1State实现
 void FunctionUartState::updateDisplay(DisplayContext* display) {
     if (!display) {
         return;
@@ -164,15 +157,9 @@ const char* FunctionUartState::getName() const
 
 void FunctionUartState::changeUartType()
 {
-    // 实现具体串口切换，现在只是界面有变化
-    //...
-
     if(m_uartType == UartType::UART_TYPE_XIAO){
         m_uartType = UartType::UART_TYPE_Grove;
     }else{
         m_uartType = UartType::UART_TYPE_XIAO;
     }
-
 }
-
-

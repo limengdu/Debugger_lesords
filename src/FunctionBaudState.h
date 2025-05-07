@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #ifndef FUNCTIONBAUDSTATE_H
 #define FUNCTIONBAUDSTATE_H
 
@@ -21,7 +17,6 @@
 #define BAUD_460800 460800
 #define BAUD_921600 921600
 
-
 struct BaudStateUI {
     lv_obj_t* Screen;
     lv_obj_t* Line;
@@ -29,7 +24,6 @@ struct BaudStateUI {
     lv_obj_t* previousBaudLabel;
     lv_obj_t* nextBaudLabel;
 };
-
 
 // 特定功能状态
 class FunctionBaudState : public FunctionState {
@@ -53,13 +47,8 @@ public:
     static uint m_baudRate;
 private:
     BaudStateUI m_baudStateUI;
-
-
     uint m_baudRateList[9] = {BAUD_4800, BAUD_9600, BAUD_19200, BAUD_38400, BAUD_57600, BAUD_115200, BAUD_230400, BAUD_460800, BAUD_921600};
     uint8_t m_currentBaudIndex;
 };
-
-
-
 
 #endif //FUNCTIONBAUDSTATE_H

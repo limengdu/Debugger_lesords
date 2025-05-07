@@ -30,8 +30,6 @@ InputTask inputTask;
 
 Adafruit_INA228 ina228;
 
-
-
 // 错误处理回调
 void appErrorHandler(int errorCode, const char* errorMsg) {
     // 记录错误到日志

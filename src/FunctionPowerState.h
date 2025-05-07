@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #ifndef FUNCTIONPOWERSTATE_H
 #define FUNCTIONPOWERSTATE_H
 
@@ -59,7 +55,6 @@ public:
 
     void clearScreen();
 
-
 private:
     // lv_obj_t *m_titleLabel;
     PowerStateUI m_powerStateUI;
@@ -81,6 +76,5 @@ private:
     int currentInterfaceIndex;
     unsigned long startTime;
 };
-
 
 #endif //FUNCTIONPOWERSTATE_H

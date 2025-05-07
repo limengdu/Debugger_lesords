@@ -1,10 +1,4 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #include "FunctionPowerState.h"
-
-
 
 FunctionPowerState::FunctionPowerState()
 : FunctionState("FunctionPowerState")
@@ -342,7 +336,6 @@ void FunctionPowerState::clearScreen()
     m_powerStateUI.totalLabel_wh = lv_label_create(m_powerStateUI.Screen);
     m_powerStateUI.totalLabel_Ah = lv_label_create(m_powerStateUI.Screen);
 }
-
 
 int FunctionPowerState::getID() const
 {

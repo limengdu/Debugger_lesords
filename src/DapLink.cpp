@@ -106,7 +106,6 @@ uint16_t get_report_callback(uint8_t report_id, hid_report_type_t report_type, u
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
 void set_report_callback(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
 {
-    Serial.printf("this is set_report_callback function %d\n", report_type);
     int i;
     // main_led_state_t led_next_state = MAIN_LED_FLASH;
     switch (report_type) {

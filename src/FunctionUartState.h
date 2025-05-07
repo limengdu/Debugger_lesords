@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #ifndef FUNCTIONUARTSTATE_H
 #define FUNCTIONUARTSTATE_H
 
@@ -10,7 +6,6 @@
 #include "MenuStates.h"
 #include "StateManager.h"
 #include "FunctionBaudState.h"
-
 
 struct UartStateUI {
     lv_obj_t* Screen;
@@ -54,6 +49,5 @@ private:
     UartType m_uartType;
     UartStateUI m_uartStateUI;
 };
-
 
 #endif //FUNCTIONUARTSTATE_H

@@ -1,7 +1,3 @@
-//
-// Created by Administrator on 25-4-29.
-//
-
 #include "ErrorState.h"
 
 // ErrorState实现

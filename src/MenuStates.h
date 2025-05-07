@@ -61,18 +61,4 @@ public:
     virtual bool handleEvent(StateMachine* machine, const Event* event);
 };
 
-// 特定功能状态
-class Function1State : public FunctionState {
-public:
-    enum { ID = 2 };
-    
-    Function1State() : FunctionState("Function 1") {}
-    
-    // 特定实现
-    virtual void updateDisplay(DisplayContext* display);
-    virtual int getID() const { return ID; }
-    virtual const char* getName() const { return "Function1"; }
-};
-
-
 #endif // MENU_STATES_H
