@@ -94,7 +94,17 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
         }
 
         case EVENT_BUTTON_PRESS: {
-            return false;
+            // 按钮按下，进入选中的功能
+            const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
+            if (buttonEvent->getButtonId() == 0) {
+                increaceBaudRate();// 测试波特率增加没有
+                int stateId = FunctionPowerState::ID;
+                State* nextState = StateManager::getInstance()->getState(stateId);
+                if (nextState) {
+                    machine->changeState(nextState);
+                    return true;
+                }
+            }
         }
 
         default:

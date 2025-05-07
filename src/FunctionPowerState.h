@@ -8,6 +8,7 @@
 #include "Global.h"
 #include "LvglStyle.h"
 #include "MenuStates.h"
+#include "FunctionUartState.h"
 
 struct PowerStateUI {
     lv_obj_t* Screen;

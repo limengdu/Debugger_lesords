@@ -127,7 +127,7 @@ void setup() {
     stateMachine.setDisplayContext(&displayContext);
 
     // 初始化状态机，以主菜单为初始状态，错误状态为异常处理状态
-    if (!stateMachine.init(uartState, errorState)) {
+    if (!stateMachine.init(mainMenu, errorState)) {
         // 初始化失败处理
         while(1); // 或者重启系统
     }

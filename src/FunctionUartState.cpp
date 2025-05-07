@@ -123,7 +123,15 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
 
         case EVENT_BUTTON_PRESS: {
             // 按钮按下，进入选中的功能
-            return false;
+            const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
+            if (buttonEvent->getButtonId() == 0) {
+                int stateId = FunctionBaudState::ID;
+                State* nextState = StateManager::getInstance()->getState(stateId);
+                if (nextState) {
+                    machine->changeState(nextState);
+                    return true;
+                }
+            }
         }
 
         default:

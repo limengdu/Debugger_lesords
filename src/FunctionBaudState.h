@@ -9,6 +9,7 @@
 #include "Global.h"
 #include "LvglStyle.h"
 #include "StateManager.h"
+#include "FunctionPowerState.h"
 
 #define BAUD_4800 4800
 #define BAUD_9600 9600

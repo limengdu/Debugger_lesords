@@ -4,7 +4,7 @@
 
 #include "FunctionPowerState.h"
 
-#include "FunctionUartState.h"
+
 
 FunctionPowerState::FunctionPowerState()
 : FunctionState("FunctionPowerState")
@@ -71,15 +71,18 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-            return false;
+                return false;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            return false;
+                return false;
         }
 
         case EVENT_BUTTON_PRESS: {
-            return false;
+            // 按钮按下，进入选中的功能
+            clearScreen();
+            currentInterfaceIndex = (currentInterfaceIndex + 1) % 3;
+            (this->*interfaceFunctions[currentInterfaceIndex])();
         }
 
         default:
@@ -94,40 +97,59 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     char buff[16];
-    sprintf(buff, "U %.4f v", m_voltage);
-    lv_label_set_text(m_powerStateUI.voltageLabel_V, buff);
-    sprintf(buff, "I  %.4f A", m_current);
-    lv_label_set_text(m_powerStateUI.currentLabel_A, buff);
-    sprintf(buff, "P %.4f w", m_power);
-    lv_label_set_text(m_powerStateUI.powerLabel_W, buff);
-    sprintf(buff, " %.4f mA", m_current*1000);
-    lv_label_set_text(m_powerStateUI.currentLabel_mA, buff);
-    sprintf(buff, " %.1f uA", m_current*1000000);
-    lv_label_set_text(m_powerStateUI.currentLabel_uA, buff);
-    sprintf(buff, " %.4f mW", m_power*1000);
-    lv_label_set_text(m_powerStateUI.powerLabel_mW, buff);
-    sprintf(buff, " %.4f Ah", m_totalCurrent);
-    lv_label_set_text(m_powerStateUI.totalLabel_Ah, buff);
-    sprintf(buff, " %.4f wh", m_totalPower);
-    lv_label_set_text(m_powerStateUI.totalLabel_wh, buff);
-    sprintf(buff, " %.4f A", m_minCurrent);
-    lv_label_set_text(m_powerStateUI.minLabel_A, buff);
-    sprintf(buff, " %.4f w", m_minPower);
-    lv_label_set_text(m_powerStateUI.minLabel_wh, buff);
-    sprintf(buff, " %.4f A", m_maxCurrent);
-    lv_label_set_text(m_powerStateUI.maxLabel_A, buff);
-    sprintf(buff, " %.4f w", m_maxPower);
-    lv_label_set_text(m_powerStateUI.maxLabel_wh, buff);
+    switch (currentInterfaceIndex){
+        case 0:{
+            sprintf(buff, "U %.4f v", m_voltage);
+            lv_label_set_text(m_powerStateUI.voltageLabel_V, buff);
+            sprintf(buff, "I  %.4f A", m_current);
+            lv_label_set_text(m_powerStateUI.currentLabel_A, buff);
+            sprintf(buff, "P %.4f w", m_power);
+            lv_label_set_text(m_powerStateUI.powerLabel_W, buff);
+            break;
+        }
+        case 1:{
+            sprintf(buff, "U %.4f v", m_voltage);
+            lv_label_set_text(m_powerStateUI.voltageLabel_V, buff);
+            sprintf(buff, "I  %.4f A", m_current);
+            lv_label_set_text(m_powerStateUI.currentLabel_A, buff);
+            sprintf(buff, "P %.4f w", m_power);
+            lv_label_set_text(m_powerStateUI.powerLabel_W, buff);
+            sprintf(buff, " %.4f mA", m_current*1000);
+            lv_label_set_text(m_powerStateUI.currentLabel_mA, buff);
+            sprintf(buff, " %.1f uA", m_current*1000000);
+            lv_label_set_text(m_powerStateUI.currentLabel_uA, buff);
+            sprintf(buff, " %.4f mW", m_power*1000);
+            lv_label_set_text(m_powerStateUI.powerLabel_mW, buff);
+            break;
+        }
+        case 2:{
+            sprintf(buff, " %.4f Ah", m_totalCurrent);
+            lv_label_set_text(m_powerStateUI.totalLabel_Ah, buff);
+            sprintf(buff, " %.4f wh", m_totalPower);
+            lv_label_set_text(m_powerStateUI.totalLabel_wh, buff);
+            sprintf(buff, " %.4f A", m_minCurrent);
+            lv_label_set_text(m_powerStateUI.minLabel_A, buff);
+            sprintf(buff, " %.4f w", m_minPower);
+            lv_label_set_text(m_powerStateUI.minLabel_wh, buff);
+            sprintf(buff, " %.4f A", m_maxCurrent);
+            lv_label_set_text(m_powerStateUI.maxLabel_A, buff);
+            sprintf(buff, " %.4f w", m_maxPower);
+            lv_label_set_text(m_powerStateUI.maxLabel_wh, buff);
 
-    unsigned long currentTime = millis() - startTime;
-    unsigned long seconds = currentTime / 1000;
-    unsigned long minutes = seconds / 60;
-    seconds = seconds % 60;
-    unsigned long hours = minutes / 60;
-    minutes = minutes % 60;
-    // 格式化时间为 00:00:00 格式，并使用换行符实现上下展示
-    sprintf(buff, "Time\n%02lu:%02lu:%02lu", hours, minutes, seconds);
-    lv_label_set_text(m_powerStateUI.timeLabel, buff);
+            unsigned long currentTime = millis() - startTime;
+            unsigned long seconds = currentTime / 1000;
+            unsigned long minutes = seconds / 60;
+            seconds = seconds % 60;
+            unsigned long hours = minutes / 60;
+            minutes = minutes % 60;
+            // 格式化时间为 00:00:00 格式，并使用换行符实现上下展示
+            sprintf(buff, "Time\n%02lu:%02lu:%02lu", hours, minutes, seconds);
+            lv_label_set_text(m_powerStateUI.timeLabel, buff);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 
@@ -314,7 +336,6 @@ void FunctionPowerState::clearScreen()
     m_powerStateUI.maxLabel_wh = lv_label_create(m_powerStateUI.Screen);
     m_powerStateUI.totalLabel_wh = lv_label_create(m_powerStateUI.Screen);
     m_powerStateUI.totalLabel_Ah = lv_label_create(m_powerStateUI.Screen);
-
 }
 
 
