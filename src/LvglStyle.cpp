@@ -1,6 +1,7 @@
 #include "LvglStyle.h"
 
 lv_style_t style_screen;
+lv_style_t style_rxtx_bg;
 lv_style_t style_uart_bg;
 lv_style_t style_power_bg;
 lv_style_t style_led;
@@ -11,12 +12,19 @@ lv_style_t style_font_14;
 lv_style_t style_font_20;
 lv_style_t style_font_22;
 lv_style_t style_font_28;
+lv_style_t style_font_32;
 lv_style_t style_font_36;
 
 void initStyle() {
     lv_style_init(&style_screen);
     /* lv_style_set_bg_color(&style_screen, lv_color_hex(0xFFFFFF)); */
     lv_style_set_bg_color(&style_screen, lv_color_hex(0x000000));
+
+    lv_style_init(&style_rxtx_bg);
+    lv_style_set_bg_color(&style_rxtx_bg, lv_color_hex(0x232325));
+    lv_style_set_pad_all(&style_rxtx_bg, 0);
+    lv_style_set_pad_top(&style_rxtx_bg, 10);
+    lv_style_set_border_width(&style_rxtx_bg, 0);
 
     lv_style_init(&style_uart_bg);
     lv_style_set_bg_color(&style_uart_bg, lv_color_hex(0x232325));
@@ -28,7 +36,6 @@ void initStyle() {
     lv_style_init(&style_power_bg);
     lv_style_set_bg_color(&style_power_bg, lv_color_hex(0x232325));
     lv_style_set_radius(&style_power_bg, 20);
-
     lv_style_set_pad_all(&style_power_bg, 0);
     lv_style_set_border_width(&style_power_bg, 0);
 
@@ -53,6 +60,9 @@ void initStyle() {
 
     lv_style_init(&style_font_28);
     lv_style_set_text_font(&style_font_28, &lv_font_montserrat_28);
+
+    lv_style_init(&style_font_32);
+    lv_style_set_text_font(&style_font_32, &lv_font_montserrat_32);
 
     lv_style_init(&style_font_36);
     lv_style_set_text_font(&style_font_36, &lv_font_montserrat_36);

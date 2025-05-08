@@ -7,7 +7,7 @@
 #include "StateManager.h"
 #include "FunctionBaudState.h"
 
-#define UART_DATA_SIZE 20
+#define UART_DATA_SIZE 50
 
 
 struct UartStateUI {
@@ -19,8 +19,8 @@ struct UartStateUI {
 
     lv_obj_t* UartTypeLabel;
     lv_obj_t* UartBaudLabel;
-    lv_obj_t* UartRxLabel;
-    lv_obj_t* UartTxLabel;
+    lv_obj_t* UartRxTextArea;
+    lv_obj_t* UartTxTextArea;
 };
 
 // 枚举串口类型
@@ -39,8 +39,8 @@ private:
     static void uartTaskFunc(void* params);
 
 public:
-    char m_rxBuff[UART_DATA_SIZE];
-    char m_txBuff[UART_DATA_SIZE];
+    static char rxBuff[UART_DATA_SIZE];
+    static char txBuff[UART_DATA_SIZE];
 
 public:
     enum { ID = 2 };
