@@ -82,6 +82,9 @@ void initLVGL() {
 }
 
 void initINA228() {
+    pinMode(MOS1_PIN, INPUT);
+    pinMode(MOS2_PIN, INPUT);
+
     ina228 = Adafruit_INA228();
 
     Wire.setPins(INA_I2C_SDA, INA_I2C_SCL);
