@@ -38,12 +38,11 @@ public:
     static uint m_baudRate;
 private:
     BaudStateUI m_baudStateUI;
-    //设置10个元素，有一个是0
-    //如果只有9个元素，当前 index为0，前一个index为8，那么久判断后就在同一侧了
-    uint m_baudRateList[10] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600,0};
+    uint m_baudRateList[9] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
     uint8_t m_currentBaudIndex;
     lv_coord_t m_screenWidth;
     lv_coord_t m_screenHeight;
+    bool m_posFlag;
 };
 
 #endif //FUNCTIONBAUDSTATE_H
