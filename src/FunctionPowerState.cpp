@@ -71,20 +71,20 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-                return false;
-        }
-
-        case EVENT_WHEEL_COUNTERCLOCKWISE: {
-                return false;
-        }
-
-        case EVENT_BUTTON_PRESS: {
-            // 按钮按下，进入选中的功能
             clearScreen();
             currentInterfaceIndex = (currentInterfaceIndex + 1) % 3;
             (this->*interfaceFunctions[currentInterfaceIndex])();
+            break;
         }
 
+        case EVENT_WHEEL_COUNTERCLOCKWISE: {
+            clearScreen();
+            currentInterfaceIndex = (currentInterfaceIndex - 1 + 3) % 3;
+            (this->*interfaceFunctions[currentInterfaceIndex])();
+            break;
+        }
+
+        case EVENT_BUTTON_PRESS:
         case EVENT_BUTTON_LONGPRESS: {
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
             if (buttonEvent->getButtonId() == BOOT_BTN) {
@@ -95,12 +95,13 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
                     return true;
                 }
             }
-            return false;
         }
 
         default:
-            return false;
+            break;
     }
+
+    return true;
 }
 
 // 计算
