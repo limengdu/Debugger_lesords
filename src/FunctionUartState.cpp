@@ -61,11 +61,11 @@ void FunctionUartState::onEnter()
 
     lv_obj_set_size(m_uartStateUI.UartTypeBg, 100, 40);
     lv_obj_set_pos(m_uartStateUI.UartTypeBg, 20, 20);
-    lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_uart_bg, 0);
+    lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_focus_bg, 0);
 
     lv_obj_set_size(m_uartStateUI.UartBaudBg, 100, 40);
     lv_obj_set_pos(m_uartStateUI.UartBaudBg, 20+160, 20);
-    lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_power_bg, 0);
+    lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_nofocus_bg, 0);
 
     lv_obj_set_size(m_uartStateUI.UartRxBg, 230, 70);
     lv_obj_set_pos(m_uartStateUI.UartRxBg, 70, 70);
@@ -128,8 +128,8 @@ void FunctionUartState::onEnter()
     lv_obj_set_style_text_color(m_uartStateUI.UartTxTextArea, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_font_14, 0);
     lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_font_14, 0);
-    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_power_bg, 0);
-    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_power_bg, 0);
+    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_nofocus_bg, 0);
+    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_nofocus_bg, 0);
     // 去掉 UartRxTextArea 的边框
     lv_obj_set_style_border_width(m_uartStateUI.UartRxTextArea, 0, LV_PART_MAIN);
     lv_obj_set_style_border_width(m_uartStateUI.UartTxTextArea, 0, LV_PART_MAIN);

@@ -5,8 +5,8 @@
 
 extern lv_style_t style_screen;
 extern lv_style_t style_rxtx_bg;
-extern lv_style_t style_uart_bg;
-extern lv_style_t style_power_bg;
+extern lv_style_t style_focus_bg;
+extern lv_style_t style_nofocus_bg;
 extern lv_style_t style_led;
 
 extern lv_style_t style_font_18;

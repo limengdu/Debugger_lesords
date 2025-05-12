@@ -1,6 +1,7 @@
 #include "MenuStates.h"
 #include "StateManager.h"
 #include "LvglStyle.h"
+#include "FunctionBaudState.h"
 
 // MainMenuState实现
 MainMenuState::MainMenuState() 
@@ -32,7 +33,7 @@ bool MainMenuState::addMenuItem(const char* label, int stateId) {
 
 void MainMenuState::onEnter() {
     // 重置选择位置
-    m_currentSelection = 0;
+    m_currentSelection = -1;
 
     if (m_mainMenu.screen != nullptr) {
         if ( lv_scr_act() != m_mainMenu.screen) {
@@ -68,31 +69,31 @@ void MainMenuState::onEnter() {
     m_mainMenu.uart_bg = lv_obj_create(m_mainMenu.screen);
     lv_obj_set_size(m_mainMenu.uart_bg, 108, 154);
     lv_obj_set_pos(m_mainMenu.uart_bg, 12 + 12, 62);
-    lv_obj_add_style(m_mainMenu.uart_bg, &style_uart_bg, 0);
+    lv_obj_add_style(m_mainMenu.uart_bg, &style_focus_bg, 0);
 
     // Baud
     label = lv_label_create(m_mainMenu.uart_bg);
     lv_label_set_text(label, "Baud");
-    lv_obj_set_pos(label, 0, 0);
+    lv_obj_set_pos(label, 12, 13);
     lv_obj_set_style_text_color(label, lv_color_hex(0xA6ACAF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_12, 0);
 
-    // 115200
+    // Baud Value
     m_mainMenu.baud_value = lv_label_create(m_mainMenu.uart_bg);
     lv_label_set_text(m_mainMenu.baud_value, "9600");
-    lv_obj_set_pos(m_mainMenu.baud_value, 0, 18);
+    lv_obj_set_pos(m_mainMenu.baud_value, 13, 33);
     lv_obj_set_style_text_color(m_mainMenu.baud_value, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_mainMenu.baud_value, &style_font_20, 0);
 
     // RX
     label = lv_label_create(m_mainMenu.uart_bg);
     lv_label_set_text(label, "RX");
-    lv_obj_set_pos(label, 0, 58);
+    lv_obj_set_pos(label, 13, 70);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
 
     lv_obj_t* led_RX = lv_led_create(m_mainMenu.uart_bg);
-    lv_obj_set_pos(led_RX, 40, 64);
+    lv_obj_set_pos(led_RX, 45, 77);
     lv_led_on(led_RX);
     lv_led_set_color(led_RX, lv_color_hex(0xDDE62F));
     lv_obj_add_style(led_RX, &style_led, 0);
@@ -100,12 +101,12 @@ void MainMenuState::onEnter() {
     // TX
     label = lv_label_create(m_mainMenu.uart_bg);
     lv_label_set_text(label, "TX");
-    lv_obj_set_pos(label, 0, 94);
+    lv_obj_set_pos(label, 13, 109);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
 
     lv_obj_t* led_TX = lv_led_create(m_mainMenu.uart_bg);
-    lv_obj_set_pos(led_TX, 40, 100);
+    lv_obj_set_pos(led_TX, 45, 115);
     lv_led_on(led_TX);
     lv_led_set_color(led_TX, lv_color_hex(0x2FE6AC));
     lv_obj_add_style(led_TX, &style_led, 0);
@@ -114,7 +115,7 @@ void MainMenuState::onEnter() {
     lv_obj_t* power_bg = lv_obj_create(m_mainMenu.screen);
     lv_obj_set_size(power_bg, 152, 154);
     lv_obj_set_pos(power_bg, 12 + 132, 62);
-    lv_obj_add_style(power_bg, &style_power_bg, 0);
+    lv_obj_add_style(power_bg, &style_nofocus_bg, 0);
 
     // 电压
     label = lv_label_create(power_bg);
@@ -190,6 +191,10 @@ bool MainMenuState::handleEvent(StateMachine* machine, const Event* event) {
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
             // 滚轮顺时针，选择下一项
+            if (m_currentSelection < 0) {
+                m_currentSelection = 0;
+            }
+
             if (m_itemCount > 0) {
                 m_currentSelection = (m_currentSelection + 1) % m_itemCount;
                 return true;
@@ -234,7 +239,6 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
 
     Adafruit_INA228* ina228 = nullptr;
     char value[10];
-    int baud_value = 9600;
     float vol = 0, cur = 0, power = 0;
 
     ina228 = display->getINA228();
@@ -243,7 +247,7 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     cur = _max(0.0, ina228->readCurrent() / 1000);
     power = vol * cur;
 
-    lv_label_set_text_fmt(m_mainMenu.baud_value, "%d", baud_value);
+    lv_label_set_text_fmt(m_mainMenu.baud_value, "%d", FunctionBaudState::m_baudRate);
 
     snprintf(value, sizeof(value), "%.4f", vol);
     lv_label_set_text(m_mainMenu.vol, value);
