@@ -1,3 +1,5 @@
+#include "Global.h"
+#include "MenuStates.h"
 #include "FunctionUartState.h"
 
 FunctionUartState::FunctionUartState()
@@ -169,6 +171,19 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
                     return true;
                 }
             }
+        }
+
+        case EVENT_BUTTON_LONGPRESS: {
+            const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
+            if (buttonEvent->getButtonId() == BOOT_BTN) {
+                int stateId = MainMenuState::ID;
+                State* nextState = StateManager::getInstance()->getState(stateId);
+                if (nextState) {
+                    machine->changeState(nextState);
+                    return true;
+                }
+            }
+            return false;
         }
 
         default:
