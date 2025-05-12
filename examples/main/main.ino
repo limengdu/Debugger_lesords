@@ -125,10 +125,10 @@ void setup() {
     FunctionUartState* uartState = new FunctionUartState();
     FunctionBaudState* baudState = new FunctionBaudState();
     FunctionPowerState* powerState = new FunctionPowerState();
+
     // 添加菜单项
-    mainMenu->addMenuItem("Function 1", FunctionUartState::ID);
-    mainMenu->addMenuItem("Function 2", FunctionBaudState::ID);
-    mainMenu->addMenuItem("Function 3", FunctionPowerState::ID);
+    mainMenu->addMenuItem("Function Uart", FunctionUartState::ID);
+    mainMenu->addMenuItem("Function Power", FunctionPowerState::ID);
     stateManager->registerState(mainMenu);
 
     // 注册功能状态

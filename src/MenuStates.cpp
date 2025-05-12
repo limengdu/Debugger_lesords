@@ -1,3 +1,4 @@
+#include "Global.h"
 #include "MenuStates.h"
 #include "StateManager.h"
 #include "LvglStyle.h"
@@ -201,10 +202,9 @@ bool MainMenuState::handleEvent(StateMachine* machine, const Event* event) {
         }
         
         case EVENT_BUTTON_PRESS: {
-            // 按钮按下，进入选中的功能
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
-            if (buttonEvent->getButtonId() == 0) { // 假设0是确认按钮
-                if (m_itemCount > 0) {
+            if (buttonEvent->getButtonId() == BOOT_BTN) {
+                if (m_currentSelection != -1) {
                     int stateId = m_items[m_currentSelection].stateId;
                     State* nextState = StateManager::getInstance()->getState(stateId);
                     if (nextState) {
@@ -215,10 +215,12 @@ bool MainMenuState::handleEvent(StateMachine* machine, const Event* event) {
             }
             return false;
         }
-        
+
         default:
             return false;
     }
+
+    return true;
 }
 
 void MainMenuState::updateDisplay(DisplayContext* display) {
