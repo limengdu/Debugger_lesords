@@ -2,6 +2,8 @@
 #define GLOBAL_H
 
 #define BOOT_BTN 0
+#define ENCODER_PINA 18
+#define ENCODER_PINB 17
 
 #define ShowSerial  Serial
 #define COMSerial   Serial0

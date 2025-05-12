@@ -74,27 +74,60 @@ void InputTask::stop() {
 void InputTask::wheelTaskFunc(void* params) {
     InputTask* inputTask = static_cast<InputTask*>(params);
     StateMachine* stateMachine = inputTask->m_stateMachine;
-    
-    for (;;) {
-        // 轮询滚轮
-        // TODO: 实现滚轮状态检测
+    EventType encoderSta = EVENT_NONE;
+    int encoderA = 0, encoderB = 0;
+    static uint cntA       = 0;
+    static uint cntB       = 0;
+    static uint buffer     = 0;
+    static uint status     = 0;
+    static uint lastStatus = 0;
 
-#ifdef INPUT_DEBUG
-        ShowSerial.printf("[%s]::%d - for loop (Wheel)\n", __func__, __LINE__);
-#endif
-        bool wheelMoved = false;
-        bool isClockwise = true;
-        
-        if (wheelMoved) {
-            // 创建滚轮事件
-            WheelEvent event(isClockwise);
-            
-            // 发送事件到状态机
+    for (;;) {
+        encoderA = digitalRead(ENCODER_PINA);
+        encoderB = digitalRead(ENCODER_PINB);
+
+        if (encoderA) {
+            if (cntA)  cntA--;
+            else      status |= 0x01;
+        } else {
+            if (cntA < 4)  cntA++;
+            else        status &= ~0x01;
+        }
+
+        if (encoderB) {
+            if (cntB)  cntB--;
+            else      status |= 0x02;
+        } else {
+            if (cntB < 4)  cntB++;
+            else        status &= ~0x02;
+        }
+
+        if (lastStatus != status) {
+            lastStatus = status;
+            buffer <<= 2;
+            buffer |= status;
+            if (status == 0x03) {
+                if (buffer == 0x87)       encoderSta = EVENT_WHEEL_COUNTERCLOCKWISE;
+                else if (buffer == 0x4B)  encoderSta = EVENT_WHEEL_CLOCKWISE;
+                buffer = 0;
+            }
+        }
+
+        if (encoderSta == EVENT_WHEEL_COUNTERCLOCKWISE) {
+            encoderSta = EVENT_NONE;
+            Serial.println("forward now");
+
+            WheelEvent event(false);
+            stateMachine->postEvent(&event);
+        } else if (encoderSta == EVENT_WHEEL_CLOCKWISE) {
+            encoderSta = EVENT_NONE;
+            Serial.println("backward now");
+
+            WheelEvent event(true);
             stateMachine->postEvent(&event);
         }
-        
-        // 滚轮检测延迟
-        vTaskDelay(pdMS_TO_TICKS(100));
+
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 

@@ -114,6 +114,8 @@ void setup() {
     initDapLink();
     initINA228();
     pinMode(BOOT_BTN, INPUT_PULLUP);
+    pinMode(ENCODER_PINA, INPUT);
+    pinMode(ENCODER_PINB, INPUT);
 
     // 注册状态
     StateManager* stateManager = StateManager::getInstance();
