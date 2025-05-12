@@ -14,6 +14,7 @@ struct MenuItem {
 struct MAIN_MENU_T {
     lv_obj_t* screen;
     lv_obj_t* uart_bg;
+    lv_obj_t* power_bg;
     lv_obj_t* baud_value;
     /* lv_obj_t* led[3]; */
     lv_obj_t* vol;

@@ -69,7 +69,7 @@ void MainMenuState::onEnter() {
     m_mainMenu.uart_bg = lv_obj_create(m_mainMenu.screen);
     lv_obj_set_size(m_mainMenu.uart_bg, 108, 154);
     lv_obj_set_pos(m_mainMenu.uart_bg, 12 + 12, 62);
-    lv_obj_add_style(m_mainMenu.uart_bg, &style_focus_bg, 0);
+    lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
 
     // Baud
     label = lv_label_create(m_mainMenu.uart_bg);
@@ -112,64 +112,64 @@ void MainMenuState::onEnter() {
     lv_obj_add_style(led_TX, &style_led, 0);
 
     // Right Block
-    lv_obj_t* power_bg = lv_obj_create(m_mainMenu.screen);
-    lv_obj_set_size(power_bg, 152, 154);
-    lv_obj_set_pos(power_bg, 12 + 132, 62);
-    lv_obj_add_style(power_bg, &style_nofocus_bg, 0);
+    m_mainMenu.power_bg = lv_obj_create(m_mainMenu.screen);
+    lv_obj_set_size(m_mainMenu.power_bg, 152, 154);
+    lv_obj_set_pos(m_mainMenu.power_bg, 12 + 132, 62);
+    lv_obj_add_style(m_mainMenu.power_bg, &style_nofocus_bg, 0);
 
     // 电压
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "U");
     lv_obj_set_pos(label, 12, 20);
     lv_obj_set_style_text_color(label, lv_color_hex(0xDDE62F), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_22, 0);
 
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "V");
     lv_obj_set_pos(label, 123, 28);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_14, 0);
 
     // 电流
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "I");
     lv_obj_set_pos(label, 12, 64);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_22, 0);
 
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "A");
     lv_obj_set_pos(label, 123, 72);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_14, 0);
 
     // 功耗
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "P");
     lv_obj_set_pos(label, 12, 107);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2F8EE6), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_22, 0);
 
-    label = lv_label_create(power_bg);
+    label = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(label, "W");
     lv_obj_set_pos(label, 123, 115);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_14, 0);
 
     // value
-    m_mainMenu.vol = lv_label_create(power_bg);
+    m_mainMenu.vol = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(m_mainMenu.vol, "5.0345");
     lv_obj_set_pos(m_mainMenu.vol, 41, 20);
     lv_obj_set_style_text_color(m_mainMenu.vol, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_mainMenu.vol, &style_font_22, 0);
 
-    m_mainMenu.cur = lv_label_create(power_bg);
+    m_mainMenu.cur = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(m_mainMenu.cur, "0.0182");
     lv_obj_set_pos(m_mainMenu.cur, 41, 64);
     lv_obj_set_style_text_color(m_mainMenu.cur, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(m_mainMenu.cur, &style_font_22, 0);
 
-    m_mainMenu.power = lv_label_create(power_bg);
+    m_mainMenu.power = lv_label_create(m_mainMenu.power_bg);
     lv_label_set_text(m_mainMenu.power, "0.0934");
     lv_obj_set_pos(m_mainMenu.power, 41, 64);
     lv_obj_set_pos(m_mainMenu.power, 41, 107);
@@ -189,26 +189,15 @@ bool MainMenuState::handleEvent(StateMachine* machine, const Event* event) {
     }
     
     switch (event->getType()) {
-        case EVENT_WHEEL_CLOCKWISE: {
-            // 滚轮顺时针，选择下一项
+        case EVENT_WHEEL_CLOCKWISE:
+        case EVENT_WHEEL_COUNTERCLOCKWISE: {
             if (m_currentSelection < 0) {
                 m_currentSelection = 0;
+            } else {
+                m_currentSelection = !m_currentSelection;
             }
 
-            if (m_itemCount > 0) {
-                m_currentSelection = (m_currentSelection + 1) % m_itemCount;
-                return true;
-            }
-            return false;
-        }
-        
-        case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            // 滚轮逆时针，选择上一项
-            if (m_itemCount > 0) {
-                m_currentSelection = (m_currentSelection + m_itemCount - 1) % m_itemCount;
-                return true;
-            }
-            return false;
+            return true;
         }
         
         case EVENT_BUTTON_PRESS: {
@@ -240,6 +229,17 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     Adafruit_INA228* ina228 = nullptr;
     char value[10];
     float vol = 0, cur = 0, power = 0;
+
+    if (m_currentSelection == -1) {
+        lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
+        lv_obj_add_style(m_mainMenu.power_bg, &style_nofocus_bg, 0);
+    } else if (m_currentSelection == 0) {
+        lv_obj_add_style(m_mainMenu.uart_bg, &style_focus_bg, 0);
+        lv_obj_add_style(m_mainMenu.power_bg, &style_nofocus_bg, 0);
+    } else if (m_currentSelection == 1) {
+        lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
+        lv_obj_add_style(m_mainMenu.power_bg, &style_focus_bg, 0);
+    }
 
     ina228 = display->getINA228();
     display->updateShuntOfINA();

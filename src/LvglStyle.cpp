@@ -38,7 +38,8 @@ void initStyle() {
     lv_style_set_bg_color(&style_nofocus_bg, lv_color_hex(0x232325));
     lv_style_set_radius(&style_nofocus_bg, 20);
     lv_style_set_pad_all(&style_nofocus_bg, 0);
-    lv_style_set_border_width(&style_nofocus_bg, 0);
+    lv_style_set_border_width(&style_nofocus_bg, 2);
+    lv_style_set_border_color(&style_nofocus_bg, lv_color_hex(0x000000));
 
     lv_style_init(&style_led);
     lv_style_set_width(&style_led, 10);
