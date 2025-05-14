@@ -3,8 +3,11 @@
 lv_style_t style_screen;
 lv_style_t style_rxtx_bg;
 lv_style_t style_focus_bg;
+lv_style_t style_focus_uart_bg;
 lv_style_t style_nofocus_bg;
+lv_style_t style_nofocus_uart_bg;
 lv_style_t style_led;
+lv_style_t style_uart_line;
 
 lv_style_t style_font_18;
 lv_style_t style_font_12;
@@ -19,6 +22,8 @@ void initStyle() {
     lv_style_init(&style_screen);
     /* lv_style_set_bg_color(&style_screen, lv_color_hex(0xFFFFFF)); */
     lv_style_set_bg_color(&style_screen, lv_color_hex(0x000000));
+    lv_style_set_pad_all(&style_screen, 0);
+    lv_style_set_border_width(&style_screen, 0);
 
     lv_style_init(&style_rxtx_bg);
     lv_style_set_bg_color(&style_rxtx_bg, lv_color_hex(0x232325));
@@ -34,6 +39,14 @@ void initStyle() {
     lv_style_set_border_color(&style_focus_bg, lv_color_hex(0xACE62F));
     lv_style_set_border_opa(&style_focus_bg, LV_OPA_COVER); // 设置边框不透明度为完全不透明
 
+    lv_style_init(&style_focus_uart_bg);
+    lv_style_set_bg_color(&style_focus_uart_bg, lv_color_hex(0x232325));
+    lv_style_set_radius(&style_focus_uart_bg, 90);
+    lv_style_set_pad_all(&style_focus_uart_bg, 0);
+    lv_style_set_border_width(&style_focus_uart_bg, 2);
+    lv_style_set_border_color(&style_focus_uart_bg, lv_color_hex(0xACE62F));
+    lv_style_set_border_opa(&style_focus_uart_bg, LV_OPA_COVER); // 设置边框不透明度为完全不透明
+
     lv_style_init(&style_nofocus_bg);
     lv_style_set_bg_color(&style_nofocus_bg, lv_color_hex(0x232325));
     lv_style_set_radius(&style_nofocus_bg, 20);
@@ -41,9 +54,21 @@ void initStyle() {
     lv_style_set_border_width(&style_nofocus_bg, 2);
     lv_style_set_border_color(&style_nofocus_bg, lv_color_hex(0x000000));
 
+    lv_style_init(&style_nofocus_uart_bg);
+    lv_style_set_bg_color(&style_nofocus_uart_bg, lv_color_hex(0x232325));
+    lv_style_set_radius(&style_nofocus_uart_bg, 90);
+    lv_style_set_pad_all(&style_nofocus_uart_bg, 0);
+    lv_style_set_border_width(&style_nofocus_uart_bg, 2);
+    lv_style_set_border_color(&style_nofocus_uart_bg, lv_color_hex(0x000000));
+
     lv_style_init(&style_led);
     lv_style_set_width(&style_led, 10);
     lv_style_set_height(&style_led, 10);
+
+    lv_style_init(&style_uart_line);
+    lv_style_set_line_color(&style_uart_line, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_line_width(&style_uart_line, 2);
+    lv_style_set_line_rounded(&style_uart_line, true);
 
     lv_style_init(&style_font_12);
     lv_style_set_text_font(&style_font_12, &lv_font_montserrat_12);

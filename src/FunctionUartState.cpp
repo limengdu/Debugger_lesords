@@ -39,102 +39,121 @@ void FunctionUartState::uartTaskFunc(void* params) {
 void FunctionUartState::onEnter()
 {
     if (m_uartStateUI.Screen != nullptr) {
-        if ( lv_scr_act() != m_uartStateUI.Screen) {
+        if (lv_scr_act() != m_uartStateUI.Screen) {
             lv_scr_load(m_uartStateUI.Screen);
         }
         return;
     }
+
     m_uartStateUI.Screen = lv_obj_create(NULL);
     lv_obj_add_style(m_uartStateUI.Screen, &style_screen, 0);
 
-    // 创建UI标签
+    // UART Type
     m_uartStateUI.UartTypeBg = lv_obj_create(m_uartStateUI.Screen);
-    m_uartStateUI.UartBaudBg = lv_obj_create(m_uartStateUI.Screen);
-    m_uartStateUI.UartRxBg= lv_obj_create(m_uartStateUI.Screen);
-    m_uartStateUI.UartTxBg = lv_obj_create(m_uartStateUI.Screen);
-    m_uartStateUI.UartTypeLabel = lv_label_create(m_uartStateUI.Screen);
-    m_uartStateUI.UartBaudLabel = lv_label_create(m_uartStateUI.Screen);
-    // Create a textarea for rx and tx display
-    m_uartStateUI.UartRxTextArea = lv_textarea_create(m_uartStateUI.UartRxBg);
-    m_uartStateUI.UartTxTextArea = lv_textarea_create(m_uartStateUI.UartTxBg);
+    lv_obj_set_size(m_uartStateUI.UartTypeBg, 130, 42);
+    lv_obj_set_pos(m_uartStateUI.UartTypeBg, 12 + 12, 15);
+    lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_nofocus_uart_bg, 0);
 
-    // 画背景块
-    lv_obj_add_style(m_uartStateUI.Screen, &style_screen, 0);
-
-    lv_obj_set_size(m_uartStateUI.UartTypeBg, 100, 40);
-    lv_obj_set_pos(m_uartStateUI.UartTypeBg, 20, 20);
-    lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_focus_bg, 0);
-
-    lv_obj_set_size(m_uartStateUI.UartBaudBg, 100, 40);
-    lv_obj_set_pos(m_uartStateUI.UartBaudBg, 20+160, 20);
-    lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_nofocus_bg, 0);
-
-    lv_obj_set_size(m_uartStateUI.UartRxBg, 230, 70);
-    lv_obj_set_pos(m_uartStateUI.UartRxBg, 70, 70);
-    lv_obj_add_style(m_uartStateUI.UartRxBg, &style_rxtx_bg, 0);
-
-    lv_obj_set_size(m_uartStateUI.UartTxBg, 230, 70);
-    lv_obj_set_pos(m_uartStateUI.UartTxBg, 70, 70+80);
-    lv_obj_add_style(m_uartStateUI.UartTxBg, &style_rxtx_bg, 0);
-    // 画元素
-    // UART
-    lv_obj_t* label = lv_label_create(m_uartStateUI.Screen);
-    lv_obj_set_pos(label, 25, 30);
+    lv_obj_t* label = lv_label_create(m_uartStateUI.UartTypeBg);
+    lv_obj_set_pos(label, 22, 10);
     lv_label_set_text(label, "UART:");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(label, &style_font_12, 0);
-    lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO)? "XIAO" : "Grove");
-    lv_obj_set_pos(m_uartStateUI.UartTypeLabel,65,30);
-    lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
-    lv_obj_add_style(m_uartStateUI.UartTypeLabel, &style_font_18, 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xA6ACAF), LV_PART_MAIN);
+    lv_obj_add_style(label, &style_font_14, 0);
 
-    // 波特率
+    m_uartStateUI.UartTypeLabel = lv_label_create(m_uartStateUI.UartTypeBg);
+    lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO)? "XIAO" : "Grove");
+    lv_obj_set_pos(m_uartStateUI.UartTypeLabel, 12 + 12 + 50, 10);
+    lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_add_style(m_uartStateUI.UartTypeLabel, &style_font_14, 0);
+
+    // BaudRate
+    m_uartStateUI.UartBaudBg = lv_obj_create(m_uartStateUI.Screen);
+    lv_obj_set_size(m_uartStateUI.UartBaudBg, 130, 42);
+    lv_obj_set_pos(m_uartStateUI.UartBaudBg, 154 + 12, 15);
+    lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_nofocus_uart_bg, 0);
+
+    m_uartStateUI.UartBaudLabel = lv_label_create(m_uartStateUI.UartBaudBg);
     lv_label_set_text_fmt(m_uartStateUI.UartBaudLabel, "%d", FunctionBaudState::m_baudRate);
-    lv_obj_set_pos(m_uartStateUI.UartBaudLabel, 20+160+20, 30);
+    lv_obj_align(m_uartStateUI.UartBaudLabel, LV_ALIGN_TOP_MID, 0, 5);
     lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(m_uartStateUI.UartBaudLabel, &style_font_22, 0);
+    lv_obj_add_style(m_uartStateUI.UartBaudLabel, &style_font_14, 0);
+
+    static lv_point_precise_t p[] = {{0, 5}, {45, 5}, {45, 0}, {45, 5}, {90, 5}};
+    label = lv_line_create(m_uartStateUI.UartBaudBg);
+    lv_obj_add_style(label, &style_uart_line, 0);
+    lv_line_set_points(label, p, 5);
+    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 22);
+
+    // RX Group
+    m_uartStateUI.UartRxGroup = lv_obj_create(m_uartStateUI.Screen);
+    lv_obj_set_size(m_uartStateUI.UartRxGroup, 272, 77);
+    lv_obj_set_pos(m_uartStateUI.UartRxGroup, 12 + 12, 64);
+    lv_obj_add_style(m_uartStateUI.UartRxGroup, &style_screen, 0);
 
     // RX
-    label = lv_label_create(m_uartStateUI.Screen);
+    label = lv_label_create(m_uartStateUI.UartRxGroup);
     lv_label_set_text(label, "RX");
-    lv_obj_set_pos(label, 20, 75);
+    lv_obj_set_pos(label, 0, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
+
     // RX LED
-    lv_obj_t* led_RX = lv_led_create(m_uartStateUI.Screen);
-    lv_obj_set_pos(led_RX, 20+30, 75+5);
+    lv_obj_t* led_RX = lv_led_create(m_uartStateUI.UartRxGroup);
+    lv_obj_set_pos(led_RX, 6, 28);
     lv_led_on(led_RX);
     lv_led_set_color(led_RX, lv_color_hex(0xDDE62F));
     lv_obj_add_style(led_RX, &style_led, 0);
 
+    // RX Area
+    m_uartStateUI.UartRxBg= lv_obj_create(m_uartStateUI.UartRxGroup);
+    lv_obj_set_size(m_uartStateUI.UartRxBg, 245, 77);
+    lv_obj_set_pos(m_uartStateUI.UartRxBg, 27, 0);
+    lv_obj_add_style(m_uartStateUI.UartRxBg, &style_nofocus_bg, 0);
+
+    m_uartStateUI.UartRxTextArea = lv_textarea_create(m_uartStateUI.UartRxGroup);
+    lv_obj_set_size(m_uartStateUI.UartRxTextArea, 215, 59);
+    lv_obj_set_pos(m_uartStateUI.UartRxTextArea, 42, 9);
+    lv_textarea_set_one_line(m_uartStateUI.UartRxTextArea, false);
+    lv_obj_set_style_text_color(m_uartStateUI.UartRxTextArea, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_border_width(m_uartStateUI.UartRxTextArea, 0, LV_PART_MAIN);
+    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_font_14, 0);
+    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_nofocus_bg, 0);
+
+    // TX Group
+    m_uartStateUI.UartTxGroup = lv_obj_create(m_uartStateUI.Screen);
+    lv_obj_set_size(m_uartStateUI.UartTxGroup, 272, 77);
+    lv_obj_set_pos(m_uartStateUI.UartTxGroup, 12 + 12, 151);
+    lv_obj_add_style(m_uartStateUI.UartTxGroup, &style_screen, 0);
+
     // TX
-    label = lv_label_create(m_uartStateUI.Screen);
+    label = lv_label_create(m_uartStateUI.UartTxGroup);
     lv_label_set_text(label, "TX");
-    lv_obj_set_pos(label, 20, 75+80);
+    lv_obj_set_pos(label, 0, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
+
     // TX LED
-    lv_obj_t* led_TX = lv_led_create(m_uartStateUI.Screen);
-    lv_obj_set_pos(led_TX, 20+30, 75+80+5);
+    lv_obj_t* led_TX = lv_led_create(m_uartStateUI.UartTxGroup);
+    lv_obj_set_pos(led_TX, 6, 28);
     lv_led_on(led_TX);
     lv_led_set_color(led_TX, lv_color_hex(0x2FE6AC));
     lv_obj_add_style(led_TX, &style_led, 0);
-    // 滚屏框
-    lv_obj_set_size(m_uartStateUI.UartRxTextArea  , 200, 60);
-    lv_obj_set_size(m_uartStateUI.UartTxTextArea  , 200, 60);
-    lv_obj_set_pos(m_uartStateUI.UartRxTextArea, 5, 0);
-    lv_obj_set_pos(m_uartStateUI.UartTxTextArea, 5, 0);
-    lv_textarea_set_one_line(m_uartStateUI.UartRxTextArea, false);
+
+    // TX Area
+    m_uartStateUI.UartTxBg = lv_obj_create(m_uartStateUI.UartTxGroup);
+    lv_obj_set_size(m_uartStateUI.UartTxBg, 245, 77);
+    lv_obj_set_pos(m_uartStateUI.UartTxBg, 27, 0);
+    lv_obj_add_style(m_uartStateUI.UartTxBg, &style_nofocus_bg, 0);
+
+    m_uartStateUI.UartTxTextArea = lv_textarea_create(m_uartStateUI.UartTxGroup);
+    lv_obj_set_size(m_uartStateUI.UartTxTextArea, 215, 59);
+    lv_obj_set_pos(m_uartStateUI.UartTxTextArea, 42, 9);
     lv_textarea_set_one_line(m_uartStateUI.UartTxTextArea, false);
-    lv_obj_set_style_text_color(m_uartStateUI.UartRxTextArea, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_set_style_text_color(m_uartStateUI.UartTxTextArea, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_font_14, 0);
-    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_font_14, 0);
-    lv_obj_add_style(m_uartStateUI.UartRxTextArea, &style_nofocus_bg, 0);
-    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_nofocus_bg, 0);
-    // 去掉 UartRxTextArea 的边框
-    lv_obj_set_style_border_width(m_uartStateUI.UartRxTextArea, 0, LV_PART_MAIN);
     lv_obj_set_style_border_width(m_uartStateUI.UartTxTextArea, 0, LV_PART_MAIN);
+    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_font_14, 0);
+    lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_nofocus_bg, 0);
+
     lv_scr_load(m_uartStateUI.Screen);
 }
 
@@ -218,6 +237,7 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
     }
     // 更新 UartRxTextArea 的文本内容
     lv_textarea_set_text(m_uartStateUI.UartRxTextArea, combinedRxText);
+
     // 将 UartRxTextArea 滚动到末尾，确保显示最新数据
     lv_obj_scroll_to_y(m_uartStateUI.UartRxTextArea, LV_COORD_MAX, LV_ANIM_ON);
 
