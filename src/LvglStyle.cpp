@@ -8,6 +8,7 @@ lv_style_t style_nofocus_bg;
 lv_style_t style_nofocus_uart_bg;
 lv_style_t style_led;
 lv_style_t style_uart_line;
+lv_style_t style_focus_uart_line;
 
 lv_style_t style_font_18;
 lv_style_t style_font_12;
@@ -69,6 +70,11 @@ void initStyle() {
     lv_style_set_line_color(&style_uart_line, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_line_width(&style_uart_line, 2);
     lv_style_set_line_rounded(&style_uart_line, true);
+
+    lv_style_init(&style_focus_uart_line);
+    lv_style_set_line_color(&style_focus_uart_line, lv_color_hex(0xACE62F));
+    lv_style_set_line_width(&style_focus_uart_line, 2);
+    lv_style_set_line_rounded(&style_focus_uart_line, true);
 
     lv_style_init(&style_font_12);
     lv_style_set_text_font(&style_font_12, &lv_font_montserrat_12);

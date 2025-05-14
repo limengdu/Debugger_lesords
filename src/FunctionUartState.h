@@ -23,6 +23,7 @@ struct UartStateUI {
 
     lv_obj_t* UartTypeLabel;
     lv_obj_t* UartBaudLabel;
+    lv_obj_t* UartBaudLine;
     lv_obj_t* UartRxTextArea;
     lv_obj_t* UartTxTextArea;
 };
@@ -39,6 +40,8 @@ private:
     UartType m_uartType;
     UartStateUI m_uartStateUI;
     TaskHandle_t m_uartTask;
+    int m_isUartInfoDisplay;
+    int m_currentSelection;
 
     static void uartTaskFunc(void* params);
 

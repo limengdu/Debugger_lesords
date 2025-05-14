@@ -4,6 +4,8 @@
 
 FunctionUartState::FunctionUartState()
     : FunctionState("FunctionUartState"),
+      m_isUartInfoDisplay(false),
+      m_currentSelection(0),
       m_uartType(UartType::UART_TYPE_XIAO),
       m_uartStateUI(),
       m_uartTask(nullptr)
@@ -38,6 +40,8 @@ void FunctionUartState::uartTaskFunc(void* params) {
 
 void FunctionUartState::onEnter()
 {
+    m_currentSelection = -1;
+
     if (m_uartStateUI.Screen != nullptr) {
         if (lv_scr_act() != m_uartStateUI.Screen) {
             lv_scr_load(m_uartStateUI.Screen);
@@ -79,10 +83,10 @@ void FunctionUartState::onEnter()
     lv_obj_add_style(m_uartStateUI.UartBaudLabel, &style_font_14, 0);
 
     static lv_point_precise_t p[] = {{0, 5}, {45, 5}, {45, 0}, {45, 5}, {90, 5}};
-    label = lv_line_create(m_uartStateUI.UartBaudBg);
-    lv_obj_add_style(label, &style_uart_line, 0);
-    lv_line_set_points(label, p, 5);
-    lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 22);
+    m_uartStateUI.UartBaudLine = lv_line_create(m_uartStateUI.UartBaudBg);
+    lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_uart_line, 0);
+    lv_line_set_points(m_uartStateUI.UartBaudLine, p, 5);
+    lv_obj_align(m_uartStateUI.UartBaudLine, LV_ALIGN_TOP_MID, 0, 22);
 
     // RX LED Group
     m_uartStateUI.UartRxLEDGroup = lv_obj_create(m_uartStateUI.Screen);
@@ -221,13 +225,18 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-            // 滚轮顺时针，选择下一项
-            return false;
+            if (m_currentSelection < 0) {
+                m_currentSelection = 0;
+            } else {
+                m_currentSelection = !m_currentSelection;
+            }
+
+            return true;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            //滚轮逆时针，选择上一项
-            return false;
+            m_isUartInfoDisplay = !m_isUartInfoDisplay;
+            return true;
         }
 
         case EVENT_BUTTON_PRESS: {
@@ -241,6 +250,7 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
                     return true;
                 }
             }
+            return false;
         }
 
         case EVENT_BUTTON_LONGPRESS: {
@@ -259,10 +269,54 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
         default:
             return false;
     }
+
+    return true;
 }
 
 void FunctionUartState::updateDisplay(DisplayContext* display) {
     if (!display) {
+        return;
+    }
+
+    lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO) ? "XIAO" : "Grove");
+    lv_label_set_text_fmt(m_uartStateUI.UartBaudLabel, "%d", FunctionBaudState::m_baudRate);
+
+    if (m_isUartInfoDisplay) {
+        lv_obj_add_flag(m_uartStateUI.UartRxLEDGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(m_uartStateUI.UartTxLEDGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(m_uartStateUI.UartRxGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(m_uartStateUI.UartTxGroup, LV_OBJ_FLAG_HIDDEN);
+    } else {
+        lv_obj_add_flag(m_uartStateUI.UartRxGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(m_uartStateUI.UartTxGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(m_uartStateUI.UartRxLEDGroup, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(m_uartStateUI.UartTxLEDGroup, LV_OBJ_FLAG_HIDDEN);
+    }
+
+    if (m_currentSelection == -1) {
+        lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_nofocus_uart_bg, 0);
+        lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+
+        lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_nofocus_uart_bg, 0);
+        lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_uart_line, 0);
+        lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    } else if (m_currentSelection == 0) {
+        lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_focus_uart_bg, 0);
+        lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xACE62F), LV_PART_MAIN);
+
+        lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_nofocus_uart_bg, 0);
+        lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_uart_line, 0);
+        lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    } else if (m_currentSelection == 1) {
+        lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_nofocus_uart_bg, 0);
+    lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+
+        lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_focus_uart_bg, 0);
+        lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_focus_uart_line, 0);
+        lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xACE62F), LV_PART_MAIN);
+    }
+
+    if (!m_isUartInfoDisplay) {
         return;
     }
 
@@ -271,10 +325,6 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
     // 将时间戳格式化为字符串并更新 rxBuff 和 txBuff
     char rxText[128];
     snprintf(rxText, sizeof(rxText), "RX: %lu\n", timestamp);  // 模拟接收数据，添加换行符
-
-    // 更新UI显示
-    lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO) ? "XIAO" : "Grove");
-    lv_label_set_text_fmt(m_uartStateUI.UartBaudLabel, "%d", FunctionBaudState::m_baudRate);
 
     // 获取当前 UartRxTextArea 的文本内容
     const char* currentRxText = lv_textarea_get_text(m_uartStateUI.UartRxTextArea);
