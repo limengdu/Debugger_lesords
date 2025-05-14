@@ -84,6 +84,54 @@ void FunctionUartState::onEnter()
     lv_line_set_points(label, p, 5);
     lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 22);
 
+    // RX LED Group
+    m_uartStateUI.UartRxLEDGroup = lv_obj_create(m_uartStateUI.Screen);
+    lv_obj_set_size(m_uartStateUI.UartRxLEDGroup, 194, 37);
+    lv_obj_set_pos(m_uartStateUI.UartRxLEDGroup, 12 + 51, 88);
+    lv_obj_add_style(m_uartStateUI.UartRxLEDGroup, &style_screen, 0);
+
+    label = lv_label_create(m_uartStateUI.UartRxLEDGroup);
+    lv_label_set_text(label, "RX");
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0xDDE62), LV_PART_MAIN);
+    lv_obj_add_style(label, &style_font_28, 0);
+
+    lv_obj_t* led_dot_RX = lv_led_create(m_uartStateUI.UartRxLEDGroup);
+    lv_obj_set_pos(led_dot_RX, 60, 14);
+    lv_led_off(led_dot_RX);
+    lv_led_set_color(led_dot_RX, lv_color_hex(0xDDE62F));
+    lv_obj_add_style(led_dot_RX, &style_led, 0);
+
+    led_dot_RX = lv_led_create(m_uartStateUI.UartRxLEDGroup);
+    lv_obj_set_pos(led_dot_RX, 124, 14);
+    lv_led_off(led_dot_RX);
+    lv_led_set_color(led_dot_RX, lv_color_hex(0xDDE62F));
+    lv_obj_add_style(led_dot_RX, &style_led, 0);
+
+    // TX LED Group
+    m_uartStateUI.UartTxLEDGroup = lv_obj_create(m_uartStateUI.Screen);
+    lv_obj_set_size(m_uartStateUI.UartTxLEDGroup, 194, 37);
+    lv_obj_set_pos(m_uartStateUI.UartTxLEDGroup, 12 + 51, 155);
+    lv_obj_add_style(m_uartStateUI.UartTxLEDGroup, &style_screen, 0);
+
+    label = lv_label_create(m_uartStateUI.UartTxLEDGroup);
+    lv_label_set_text(label, "TX");
+    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
+    lv_obj_add_style(label, &style_font_28, 0);
+
+    lv_obj_t* led_dot_TX = lv_led_create(m_uartStateUI.UartTxLEDGroup);
+    lv_obj_set_pos(led_dot_TX, 60, 14);
+    lv_led_off(led_dot_TX);
+    lv_led_set_color(led_dot_TX, lv_color_hex(0x2FE6AC));
+    lv_obj_add_style(led_dot_TX, &style_led, 0);
+
+    led_dot_TX = lv_led_create(m_uartStateUI.UartTxLEDGroup);
+    lv_obj_set_pos(led_dot_TX, 124, 14);
+    lv_led_off(led_dot_TX);
+    lv_led_set_color(led_dot_TX, lv_color_hex(0x2FE6AC));
+    lv_obj_add_style(led_dot_TX, &style_led, 0);
+
     // RX Group
     m_uartStateUI.UartRxGroup = lv_obj_create(m_uartStateUI.Screen);
     lv_obj_set_size(m_uartStateUI.UartRxGroup, 272, 77);
@@ -153,6 +201,9 @@ void FunctionUartState::onEnter()
     lv_obj_set_style_border_width(m_uartStateUI.UartTxTextArea, 0, LV_PART_MAIN);
     lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_font_14, 0);
     lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_nofocus_bg, 0);
+
+    lv_obj_add_flag(m_uartStateUI.UartRxGroup, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(m_uartStateUI.UartTxGroup, LV_OBJ_FLAG_HIDDEN);
 
     lv_scr_load(m_uartStateUI.Screen);
 }

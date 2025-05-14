@@ -16,6 +16,8 @@ struct UartStateUI {
     lv_obj_t* UartBaudBg;
     lv_obj_t* UartRxBg;
     lv_obj_t* UartTxBg;
+    lv_obj_t* UartRxLEDGroup;
+    lv_obj_t* UartTxLEDGroup;
     lv_obj_t* UartRxGroup;
     lv_obj_t* UartTxGroup;
 
