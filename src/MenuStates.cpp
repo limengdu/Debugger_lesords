@@ -202,6 +202,11 @@ bool MainMenuState::handleEvent(StateMachine* machine, const Event* event) {
         }
         
         case EVENT_BUTTON_PRESS: {
+            if (m_currentSelection < 0) {
+                m_currentSelection = 0;
+                break;
+            }
+
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
             if (buttonEvent->getButtonId() == BOOT_BTN) {
                 if (m_currentSelection != -1) {

@@ -224,23 +224,22 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
     }
 
     switch (event->getType()) {
-        case EVENT_WHEEL_CLOCKWISE: {
+        case EVENT_WHEEL_CLOCKWISE:
+        case EVENT_WHEEL_COUNTERCLOCKWISE: {
             if (m_currentSelection < 0) {
-                m_currentSelection = 0;
+                m_isUartInfoDisplay = !m_isUartInfoDisplay;
             } else {
                 m_currentSelection = !m_currentSelection;
             }
-
-            break;
-        }
-
-        case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            m_isUartInfoDisplay = !m_isUartInfoDisplay;
             break;
         }
 
         case EVENT_BUTTON_PRESS: {
-            // 按钮按下，进入选中的功能
+            if (m_currentSelection < 0) {
+                m_currentSelection = 0;
+                break;
+            }
+
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
             if (buttonEvent->getButtonId() == BOOT_BTN) {
                 if (m_currentSelection == -1) {
@@ -261,6 +260,11 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
         }
 
         case EVENT_BUTTON_LONGPRESS: {
+            if (m_currentSelection >= 0) {
+                m_currentSelection = -1;
+                break;
+            }
+
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
             if (buttonEvent->getButtonId() == BOOT_BTN) {
                 int stateId = MainMenuState::ID;
