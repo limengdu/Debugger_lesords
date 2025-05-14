@@ -94,30 +94,37 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-            return false;
+            increaceBaudIndex();
+            break;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            return false;
+            decreaceBaudIndex();
+            break;
         }
 
         case EVENT_BUTTON_PRESS: {
-            // 按钮按下，进入选中的功能
+            break;
+        }
+
+        case EVENT_BUTTON_LONGPRESS: {
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
-            if (buttonEvent->getButtonId() == 0) {
-                // increaceBaudIndex();// 测试波特率界面有没有变化
-                int stateId = FunctionPowerState::ID;
+            if (buttonEvent->getButtonId() == BOOT_BTN) {
+                int stateId = FunctionUartState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
                     machine->changeState(nextState);
-                    return true;
+                    break;
                 }
             }
+            return false;
         }
 
         default:
             return false;
     }
+
+    return true;
 }
 
 void FunctionBaudState::updateDisplay(DisplayContext* display)

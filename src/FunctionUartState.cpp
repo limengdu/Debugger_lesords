@@ -231,23 +231,30 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
                 m_currentSelection = !m_currentSelection;
             }
 
-            return true;
+            break;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
             m_isUartInfoDisplay = !m_isUartInfoDisplay;
-            return true;
+            break;
         }
 
         case EVENT_BUTTON_PRESS: {
             // 按钮按下，进入选中的功能
             const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
-            if (buttonEvent->getButtonId() == 0) {
-                int stateId = FunctionBaudState::ID;
-                State* nextState = StateManager::getInstance()->getState(stateId);
-                if (nextState) {
-                    machine->changeState(nextState);
-                    return true;
+            if (buttonEvent->getButtonId() == BOOT_BTN) {
+                if (m_currentSelection == -1) {
+                    m_currentSelection = 0;
+                } else if (m_currentSelection == 0) {
+                    changeUartType();
+                    break;
+                } else if (m_currentSelection == 1) {
+                    int stateId = FunctionBaudState::ID;
+                    State* nextState = StateManager::getInstance()->getState(stateId);
+                    if (nextState) {
+                        machine->changeState(nextState);
+                        break;
+                    }
                 }
             }
             return false;
@@ -260,7 +267,7 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
                     machine->changeState(nextState);
-                    return true;
+                    break;
                 }
             }
             return false;
@@ -357,8 +364,6 @@ const char* FunctionUartState::getName() const
 
 void FunctionUartState::changeUartType()
 {
-    // 实现具体串口切换，现在只是界面有变化
-    //...
     if(m_uartType == UartType::UART_TYPE_XIAO){
         m_uartType = UartType::UART_TYPE_Grove;
         digitalWrite(UART_SWITCH, HIGH);
