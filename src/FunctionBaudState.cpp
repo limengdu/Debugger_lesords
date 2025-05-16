@@ -98,7 +98,18 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
         }
 
         case EVENT_BUTTON_PRESS: {
-            break;
+            const ButtonEvent* buttonEvent = static_cast<const ButtonEvent*>(event);
+            if (buttonEvent->getButtonId() == BOOT_BTN) {
+                int stateId = FunctionUartState::ID;
+                State* nextState = StateManager::getInstance()->getState(stateId);
+                if (nextState) {
+                    m_baudRate = m_baudRateList[m_currentBaudIndex];
+                    machine->requestDisplayUpdate();
+                    machine->changeState(nextState);
+                    break;
+                }
+            }
+            return false;
         }
 
         case EVENT_BUTTON_LONGPRESS: {
@@ -125,6 +136,10 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
 {
     if (!display) {
         return;
+    }
+
+    if (m_baudRate == m_baudRateList[m_currentBaudIndex]) {
+        display->updateBaudLED(m_currentBaudIndex);
     }
 }
 
