@@ -1,5 +1,5 @@
-#ifndef FUNCTIONBAUDSTATE_H
-#define FUNCTIONBAUDSTATE_H
+#ifndef FUNCTION_BAUD_STATE_H
+#define FUNCTION_BAUD_STATE_H
 
 #include "MenuStates.h"
 #include "Global.h"
@@ -7,12 +7,12 @@
 #include "StateManager.h"
 #include "FunctionPowerState.h"
 
-struct BaudStateUI {
-    lv_obj_t* Screen;
-    lv_obj_t* Line;
-    lv_obj_t* currentBaudLabel;
-    lv_obj_t* previousBaudLabel;
-    lv_obj_t* nextBaudLabel;
+#define NUM_BAUDRATES 9
+
+struct BAUD_STATE_UI_T {
+    lv_obj_t* screen;
+    lv_obj_t* roller;
+    lv_obj_t* labels[NUM_BAUDRATES];
 };
 
 // 特定功能状态
@@ -30,19 +30,12 @@ public:
     void onExit() override;
     bool handleEvent(StateMachine* machine, const Event* event) override;
 
-    void increaceBaudIndex();
-    void decreaceBaudIndex();
-    void updateBaudRate();
-
 public:
     static uint m_baudRate;
 private:
-    BaudStateUI m_baudStateUI;
-    uint m_baudRateList[9] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
+    BAUD_STATE_UI_T m_baudStateUI;
+    uint m_baudRateList[NUM_BAUDRATES] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
     uint8_t m_currentBaudIndex;
-    lv_coord_t m_screenWidth;
-    lv_coord_t m_screenHeight;
-    bool m_posFlag;
 };
 
-#endif //FUNCTIONBAUDSTATE_H
+#endif // FUNCTION_BAUD_STATE_H

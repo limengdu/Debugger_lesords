@@ -1,89 +1,77 @@
 #include "FunctionBaudState.h"
 
 FunctionBaudState::FunctionBaudState()
-: FunctionState("FunctionBaudState")
-, m_baudStateUI()
-, m_currentBaudIndex(1)
-, m_screenWidth(0)
-, m_screenHeight(0)
-, m_posFlag(true)
+    : FunctionState("FunctionBaudState"),
+      m_currentBaudIndex(1)
 {
+    m_baudStateUI.screen = nullptr;
+    m_baudStateUI.roller = nullptr;
 
+    for (int i = 0; i < NUM_BAUDRATES; i++) {
+        m_baudStateUI.labels[i] = nullptr;
+    }
 }
+
 void FunctionBaudState::onEnter()
 {
-    if (m_baudStateUI.Screen != nullptr) {
-        if ( lv_scr_act() != m_baudStateUI.Screen) {
-            lv_scr_load(m_baudStateUI.Screen);
+    if (m_baudStateUI.screen != nullptr) {
+        if (lv_scr_act() != m_baudStateUI.screen) {
+            lv_scr_load(m_baudStateUI.screen);
         }
         return;
     }
-    m_baudStateUI.Screen = lv_obj_create(NULL);
-    lv_obj_add_style(m_baudStateUI.Screen, &style_screen, 0);
 
-    m_baudStateUI.Line = lv_line_create(m_baudStateUI.Screen);
-    // 获取屏幕的高度和宽度
-    m_screenWidth = lv_disp_get_hor_res(NULL);
-    m_screenHeight = lv_disp_get_ver_res(NULL);
-    // 计算水平居中时线的 y 坐标
-    lv_coord_t center_y = m_screenHeight / 2;
-    // 定义线的两个端点
-    static lv_point_precise_t line_points[] = {
-        {0, center_y},
-        {m_screenWidth, center_y}
-    };
-    // 设置线的端点
-    lv_line_set_points(m_baudStateUI.Line, line_points, 2);
-    // 设置线的样式
-    lv_obj_set_style_line_color(m_baudStateUI.Line, lv_color_hex(0xFFFFFF), 0);
-    lv_obj_set_style_line_width(m_baudStateUI.Line, 2, 0);
+    m_baudStateUI.screen = lv_obj_create(NULL);
+    lv_obj_add_style(m_baudStateUI.screen, &style_screen, 0);
 
-    m_baudStateUI.currentBaudLabel = lv_label_create(m_baudStateUI.Screen);
-    m_baudStateUI.nextBaudLabel = lv_label_create(m_baudStateUI.Screen);
-    m_baudStateUI.previousBaudLabel = lv_label_create(m_baudStateUI.Screen);
+    m_baudStateUI.roller = lv_obj_create(m_baudStateUI.screen);
+    lv_obj_set_size(m_baudStateUI.roller, 272, 88);
+    lv_obj_center(m_baudStateUI.roller);
+    lv_obj_set_scroll_dir(m_baudStateUI.roller, LV_DIR_HOR);
+    lv_obj_set_scroll_snap_x(m_baudStateUI.roller, LV_SCROLL_SNAP_CENTER);
+    lv_obj_set_scrollbar_mode(m_baudStateUI.roller, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_bg_color(m_baudStateUI.roller, lv_color_hex(0x000000), 0);
+    lv_obj_set_style_pad_column(m_baudStateUI.roller, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(m_baudStateUI.roller, 0, LV_PART_MAIN);
 
-    char buf[16];
-    // 上一个波特率
-    uint8_t prevBaudIndex = m_currentBaudIndex - 1;
-    if (prevBaudIndex < 0){
-        m_currentBaudIndex = sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) ;
+    lv_obj_t* center_line = lv_obj_create(m_baudStateUI.screen);
+    lv_obj_set_size(center_line, 272, 4);
+    lv_obj_set_style_bg_color(center_line, lv_color_hex(0xACE62F), 0);
+    lv_obj_set_style_bg_opa(center_line, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(center_line, 0, 0);
+    lv_obj_align_to(center_line, m_baudStateUI.roller, LV_ALIGN_CENTER, 0, 0);
+
+    for (int i = 0; i < NUM_BAUDRATES; i++) {
+        lv_obj_t* item = lv_obj_create(m_baudStateUI.roller);
+        lv_obj_set_height(item, 40);
+        lv_obj_clear_flag(item, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_bg_opa(item, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_border_width(item, 0, 0);
+        lv_obj_set_style_pad_all(item, 0, 0);
+
+        static lv_point_precise_t p[] = {{0, 0}, {0, 10}};
+        lv_obj_t* line = lv_line_create(m_baudStateUI.roller);
+        lv_obj_add_style(line, &style_focus_uart_line, LV_PART_MAIN);
+        lv_line_set_points(line, p, 2);
+
+        m_baudStateUI.labels[i] = lv_label_create(item);
+        lv_label_set_text(m_baudStateUI.labels[i], String(m_baudRateList[i]).c_str());
+        lv_obj_set_style_text_font(m_baudStateUI.labels[i], &lv_font_montserrat_26, 0);
+        lv_obj_set_style_text_color(m_baudStateUI.labels[i], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+        lv_obj_center(m_baudStateUI.labels[i]);
+
+        lv_obj_align_to(item, m_baudStateUI.roller, LV_ALIGN_CENTER, i * 100, (i % 2) ? -30 : 30);
+        lv_obj_align_to(line, m_baudStateUI.roller, LV_ALIGN_CENTER, i * 100, (i % 2) ? -5 : 5);
     }
-    sprintf(buf, "%d", m_baudRateList[prevBaudIndex]);
-    lv_label_set_text(m_baudStateUI.previousBaudLabel, buf);
-    lv_obj_set_style_text_color(m_baudStateUI.previousBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(m_baudStateUI.previousBaudLabel, &style_font_22, 0);
 
-    // 当前波特率
-    sprintf(buf, "%d", m_baudRateList[m_currentBaudIndex]);
-    lv_label_set_text(m_baudStateUI.currentBaudLabel, buf);
-    // 根据索引奇偶性设置位置
-    if (m_posFlag) {
-        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2+5));
-        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2-25));
-        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2-25));
-    } else {
-        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2-25));
-        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2+5));
-        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2+5));
-    }
-    lv_obj_set_style_text_color(m_baudStateUI.currentBaudLabel, lv_color_hex(0xDDE62F), LV_PART_MAIN);
-    lv_obj_add_style(m_baudStateUI.currentBaudLabel, &style_font_22, 0);
-    // 下一个波特率
-    uint8_t nextBaudIndex = m_currentBaudIndex + 1;
-    if (nextBaudIndex >= sizeof(m_baudRateList) / sizeof(m_baudRateList[0])){
-        nextBaudIndex = 0;
-    }
-    sprintf(buf, "%d", m_baudRateList[nextBaudIndex]);
-    lv_label_set_text(m_baudStateUI.nextBaudLabel, buf);
-    lv_obj_set_style_text_color(m_baudStateUI.nextBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(m_baudStateUI.nextBaudLabel, &style_font_22, 0);
+    lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_OFF);
+    lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
 
-    lv_scr_load(m_baudStateUI.Screen);
+    lv_scr_load(m_baudStateUI.screen);
 }
 
 void FunctionBaudState::onExit()
 {
-
 }
 
 bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
@@ -94,12 +82,18 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-            increaceBaudIndex();
+            if (m_currentBaudIndex == 8) break;
+            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+            lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
+            lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_ON);
             break;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            decreaceBaudIndex();
+            if (m_currentBaudIndex == 0) break;
+            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+            lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
+            lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_ON);
             break;
         }
 
@@ -132,50 +126,6 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
     if (!display) {
         return;
     }
-
-    char buf[16];
-    sprintf(buf, "%d", m_baudRateList[m_currentBaudIndex]);
-    lv_label_set_text(m_baudStateUI.currentBaudLabel, buf);
-    // Correctly calculate the previous baud index
-    uint8_t prevBaudIndex = (m_currentBaudIndex == 0) ? (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1) : m_currentBaudIndex - 1;
-    sprintf(buf, "%d", m_baudRateList[prevBaudIndex]);
-    lv_label_set_text(m_baudStateUI.previousBaudLabel, buf);
-    // Correctly calculate the next baud index
-    uint8_t nextBaudIndex = (m_currentBaudIndex == (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1)) ? 0 : m_currentBaudIndex + 1;
-    sprintf(buf, "%d", m_baudRateList[nextBaudIndex]);
-    lv_label_set_text(m_baudStateUI.nextBaudLabel, buf);
-
-    if (m_posFlag) {
-        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2+5));
-        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2-25));
-        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2-25));
-    } else {
-        lv_obj_set_pos(m_baudStateUI.currentBaudLabel, (m_screenWidth/2 - 40), (m_screenHeight/2-25));
-        lv_obj_set_pos(m_baudStateUI.previousBaudLabel, 20, (m_screenHeight/2+5));
-        lv_obj_set_pos(m_baudStateUI.nextBaudLabel, (m_screenWidth - 100), (m_screenHeight/2+5));
-    }
-}
-
-void FunctionBaudState::increaceBaudIndex()
-{
-    uint8_t nextBaudIndex = (m_currentBaudIndex == (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1)) ? 0 : m_currentBaudIndex + 1;
-    m_currentBaudIndex = nextBaudIndex;
-    m_baudRate = m_baudRateList[m_currentBaudIndex];
-    m_posFlag = !m_posFlag;
-}
-
-void FunctionBaudState::decreaceBaudIndex()
-{
-    uint8_t prevBaudIndex = (m_currentBaudIndex == 0) ? (sizeof(m_baudRateList) / sizeof(m_baudRateList[0]) - 1) : m_currentBaudIndex - 1;
-    m_currentBaudIndex = prevBaudIndex;
-    m_baudRate = m_baudRateList[m_currentBaudIndex];
-    m_posFlag = !m_posFlag;
-}
-
-void FunctionBaudState::updateBaudRate()
-{
-    // todo 这里要具体设置波特率，根据当前索引拿到波特率
-    // m_baudRate = m_baudRateList[m_currentBaudIndex];
 }
 
 int FunctionBaudState::getID() const
