@@ -115,13 +115,11 @@ void InputTask::wheelTaskFunc(void* params) {
 
         if (encoderSta == EVENT_WHEEL_COUNTERCLOCKWISE) {
             encoderSta = EVENT_NONE;
-            Serial.println("forward now");
 
             WheelEvent event(false);
             stateMachine->postEvent(&event);
         } else if (encoderSta == EVENT_WHEEL_CLOCKWISE) {
             encoderSta = EVENT_NONE;
-            Serial.println("backward now");
 
             WheelEvent event(true);
             stateMachine->postEvent(&event);

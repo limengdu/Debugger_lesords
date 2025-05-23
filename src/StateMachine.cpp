@@ -110,6 +110,7 @@ void StateMachine::stateMachineTaskFunc(void* params) {
 
             // 处理事件
             machine->handleEvent(event);
+            continue;
         }
 
         if (machine->m_displayContext) {
@@ -118,7 +119,7 @@ void StateMachine::stateMachineTaskFunc(void* params) {
 
         lv_timer_handler(); /* let the GUI do its work */
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -149,6 +150,15 @@ bool StateMachine::handleEvent(const Event* event) {
     xSemaphoreGive(m_stateMutex);
 
     bool handled = false;
+    static EventType lastType = EVENT_NONE;
+    static uint32_t lastTime = 0;
+
+    if (lastType == event->getType() && (millis() - lastTime) < 60) {
+        return false;
+    }
+
+    lastType = event->getType();
+    lastTime = millis();
 
     try {
         handled = state->handleEvent(this, event);
@@ -160,6 +170,7 @@ bool StateMachine::handleEvent(const Event* event) {
                 xSemaphoreGive(m_stateMutex);
 
                 currentState->updateDisplay(m_displayContext);
+                lv_timer_handler();
             }
         }
     } catch(...) {
@@ -270,5 +281,6 @@ void StateMachine::requestDisplayUpdate() {
     State* state = getCurrentState();
     if (state) {
         state->updateDisplay(m_displayContext);
+        lv_timer_handler();
     }
 }
