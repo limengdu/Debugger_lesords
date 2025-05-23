@@ -85,7 +85,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             if (m_currentBaudIndex == 8) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_ON);
+            scroll_anim(m_baudStateUI.roller, 100 * m_currentBaudIndex);
             break;
         }
 
@@ -93,7 +93,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             if (m_currentBaudIndex == 0) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_ON);
+            scroll_anim(m_baudStateUI.roller, 100 * m_currentBaudIndex);
             break;
         }
 
@@ -141,6 +141,24 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
     if (m_baudRate == m_baudRateList[m_currentBaudIndex]) {
         display->updateBaudLED(m_currentBaudIndex);
     }
+}
+
+void scroll_x_anim(void * obj, int32_t v)
+{
+    lv_obj_scroll_to_x((lv_obj_t*)obj, v, LV_ANIM_OFF);
+}
+
+void FunctionBaudState::scroll_anim(lv_obj_t* obj, int32_t v)
+{
+    lv_anim_t anim;
+    lv_anim_init(&anim);
+    lv_anim_set_var(&anim, obj);
+    lv_anim_set_duration(&anim, 100);
+
+    lv_anim_set_values(&anim, lv_obj_get_scroll_x(obj), v);
+    lv_anim_set_exec_cb(&anim, scroll_x_anim);
+    lv_anim_set_path_cb(&anim, lv_anim_path_linear);
+    lv_anim_start(&anim);
 }
 
 int FunctionBaudState::getID() const
