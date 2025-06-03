@@ -24,6 +24,12 @@ struct UartStateUI {
     lv_obj_t* UartTypeLabel;
     lv_obj_t* UartBaudLabel;
     lv_obj_t* UartBaudLine;
+    lv_obj_t* UartRxLedLeftList[5];
+    lv_obj_t* UartRxLedRightList[5];
+    lv_obj_t* UartTxLedLeftList[5];
+    lv_obj_t* UartTxLedRightList[5];
+    lv_obj_t* UartRxLed;
+    lv_obj_t* UartTxLed;
     lv_obj_t* UartRxTextArea;
     lv_obj_t* UartTxTextArea;
 };
@@ -44,6 +50,9 @@ private:
     int m_currentSelection;
 
     static void uartTaskFunc(void* params);
+    void createOptionBarUI();
+    void createLedUI();
+    void createMessageUI();
 
 public:
     static char rxBuff[UART_DATA_SIZE];

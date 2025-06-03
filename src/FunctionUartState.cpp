@@ -38,20 +38,7 @@ void FunctionUartState::uartTaskFunc(void* params) {
     }
 }
 
-void FunctionUartState::onEnter()
-{
-    m_currentSelection = -1;
-
-    if (m_uartStateUI.Screen != nullptr) {
-        if (lv_scr_act() != m_uartStateUI.Screen) {
-            lv_scr_load(m_uartStateUI.Screen);
-        }
-        return;
-    }
-
-    m_uartStateUI.Screen = lv_obj_create(NULL);
-    lv_obj_add_style(m_uartStateUI.Screen, &style_screen, 0);
-
+void FunctionUartState::createOptionBarUI() {
     // UART Type
     m_uartStateUI.UartTypeBg = lv_obj_create(m_uartStateUI.Screen);
     lv_obj_set_size(m_uartStateUI.UartTypeBg, 130, 42);
@@ -87,30 +74,34 @@ void FunctionUartState::onEnter()
     lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_uart_line, 0);
     lv_line_set_points(m_uartStateUI.UartBaudLine, p, 5);
     lv_obj_align(m_uartStateUI.UartBaudLine, LV_ALIGN_TOP_MID, 0, 22);
+}
 
+void FunctionUartState::createLedUI() {
     // RX LED Group
     m_uartStateUI.UartRxLEDGroup = lv_obj_create(m_uartStateUI.Screen);
     lv_obj_set_size(m_uartStateUI.UartRxLEDGroup, 194, 37);
     lv_obj_set_pos(m_uartStateUI.UartRxLEDGroup, 12 + 51, 88);
     lv_obj_add_style(m_uartStateUI.UartRxLEDGroup, &style_screen, 0);
 
-    label = lv_label_create(m_uartStateUI.UartRxLEDGroup);
+    lv_obj_t* label = lv_label_create(m_uartStateUI.UartRxLEDGroup);
     lv_label_set_text(label, "RX");
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xDDE62), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_28, 0);
 
-    lv_obj_t* led_dot_RX = lv_led_create(m_uartStateUI.UartRxLEDGroup);
-    lv_obj_set_pos(led_dot_RX, 60, 14);
-    lv_led_off(led_dot_RX);
-    lv_led_set_color(led_dot_RX, lv_color_hex(0xDDE62F));
-    lv_obj_add_style(led_dot_RX, &style_led, 0);
+    m_uartStateUI.UartRxLedLeftList[0] = lv_led_create(m_uartStateUI.UartRxLEDGroup);
+    lv_obj_set_pos(m_uartStateUI.UartRxLedLeftList[0], 60, 14);
+    lv_led_off(m_uartStateUI.UartRxLedLeftList[0]);
+    lv_led_set_color(m_uartStateUI.UartRxLedLeftList[0], lv_color_hex(0xDDE62F));
+    lv_obj_set_style_width(m_uartStateUI.UartRxLedLeftList[0], 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartRxLedLeftList[0], 10, 0);
 
-    led_dot_RX = lv_led_create(m_uartStateUI.UartRxLEDGroup);
-    lv_obj_set_pos(led_dot_RX, 124, 14);
-    lv_led_off(led_dot_RX);
-    lv_led_set_color(led_dot_RX, lv_color_hex(0xDDE62F));
-    lv_obj_add_style(led_dot_RX, &style_led, 0);
+    m_uartStateUI.UartRxLedRightList[0] = lv_led_create(m_uartStateUI.UartRxLEDGroup);
+    lv_obj_set_pos(m_uartStateUI.UartRxLedRightList[0], 124, 14);
+    lv_led_off(m_uartStateUI.UartRxLedRightList[0]);
+    lv_led_set_color(m_uartStateUI.UartRxLedRightList[0], lv_color_hex(0xDDE62F));
+    lv_obj_set_style_width(m_uartStateUI.UartRxLedRightList[0], 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartRxLedRightList[0], 10, 0);
 
     // TX LED Group
     m_uartStateUI.UartTxLEDGroup = lv_obj_create(m_uartStateUI.Screen);
@@ -124,18 +115,22 @@ void FunctionUartState::onEnter()
     lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_28, 0);
 
-    lv_obj_t* led_dot_TX = lv_led_create(m_uartStateUI.UartTxLEDGroup);
-    lv_obj_set_pos(led_dot_TX, 60, 14);
-    lv_led_off(led_dot_TX);
-    lv_led_set_color(led_dot_TX, lv_color_hex(0x2FE6AC));
-    lv_obj_add_style(led_dot_TX, &style_led, 0);
+    m_uartStateUI.UartTxLedLeftList[0] = lv_led_create(m_uartStateUI.UartTxLEDGroup);
+    lv_obj_set_pos(m_uartStateUI.UartTxLedLeftList[0], 60, 14);
+    lv_led_off(m_uartStateUI.UartTxLedLeftList[0]);
+    lv_led_set_color(m_uartStateUI.UartTxLedLeftList[0], lv_color_hex(0x2FE6AC));
+    lv_obj_set_style_width(m_uartStateUI.UartTxLedLeftList[0], 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartTxLedLeftList[0], 10, 0);
 
-    led_dot_TX = lv_led_create(m_uartStateUI.UartTxLEDGroup);
-    lv_obj_set_pos(led_dot_TX, 124, 14);
-    lv_led_off(led_dot_TX);
-    lv_led_set_color(led_dot_TX, lv_color_hex(0x2FE6AC));
-    lv_obj_add_style(led_dot_TX, &style_led, 0);
+    m_uartStateUI.UartTxLedRightList[0] = lv_led_create(m_uartStateUI.UartTxLEDGroup);
+    lv_obj_set_pos(m_uartStateUI.UartTxLedRightList[0], 124, 14);
+    lv_led_off(m_uartStateUI.UartTxLedRightList[0]);
+    lv_led_set_color(m_uartStateUI.UartTxLedRightList[0], lv_color_hex(0x2FE6AC));
+    lv_obj_set_style_width(m_uartStateUI.UartTxLedRightList[0], 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartTxLedRightList[0], 10, 0);
+}
 
+void FunctionUartState::createMessageUI() {
     // RX Group
     m_uartStateUI.UartRxGroup = lv_obj_create(m_uartStateUI.Screen);
     lv_obj_set_size(m_uartStateUI.UartRxGroup, 272, 77);
@@ -143,18 +138,19 @@ void FunctionUartState::onEnter()
     lv_obj_add_style(m_uartStateUI.UartRxGroup, &style_screen, 0);
 
     // RX
-    label = lv_label_create(m_uartStateUI.UartRxGroup);
+    lv_obj_t* label = lv_label_create(m_uartStateUI.UartRxGroup);
     lv_label_set_text(label, "RX");
     lv_obj_set_pos(label, 0, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
 
     // RX LED
-    lv_obj_t* led_RX = lv_led_create(m_uartStateUI.UartRxGroup);
-    lv_obj_set_pos(led_RX, 6, 28);
-    lv_led_on(led_RX);
-    lv_led_set_color(led_RX, lv_color_hex(0xDDE62F));
-    lv_obj_add_style(led_RX, &style_led, 0);
+    m_uartStateUI.UartRxLed = lv_led_create(m_uartStateUI.UartRxGroup);
+    lv_obj_set_pos(m_uartStateUI.UartRxLed, 8, 28);
+    lv_led_on(m_uartStateUI.UartRxLed);
+    lv_led_set_color(m_uartStateUI.UartRxLed, lv_color_hex(0xDDE62F));
+    lv_obj_set_style_width(m_uartStateUI.UartRxLed, 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartRxLed, 10, 0);
 
     // RX Area
     m_uartStateUI.UartRxBg= lv_obj_create(m_uartStateUI.UartRxGroup);
@@ -185,11 +181,12 @@ void FunctionUartState::onEnter()
     lv_obj_add_style(label, &style_font_18, 0);
 
     // TX LED
-    lv_obj_t* led_TX = lv_led_create(m_uartStateUI.UartTxGroup);
-    lv_obj_set_pos(led_TX, 6, 28);
-    lv_led_on(led_TX);
-    lv_led_set_color(led_TX, lv_color_hex(0x2FE6AC));
-    lv_obj_add_style(led_TX, &style_led, 0);
+    m_uartStateUI.UartTxLed = lv_led_create(m_uartStateUI.UartTxGroup);
+    lv_obj_set_pos(m_uartStateUI.UartTxLed, 8, 28);
+    lv_led_on(m_uartStateUI.UartTxLed);
+    lv_led_set_color(m_uartStateUI.UartTxLed, lv_color_hex(0x2FE6AC));
+    lv_obj_set_style_width(m_uartStateUI.UartTxLed, 10, 0);
+    lv_obj_set_style_height(m_uartStateUI.UartTxLed, 10, 0);
 
     // TX Area
     m_uartStateUI.UartTxBg = lv_obj_create(m_uartStateUI.UartTxGroup);
@@ -205,6 +202,25 @@ void FunctionUartState::onEnter()
     lv_obj_set_style_border_width(m_uartStateUI.UartTxTextArea, 0, LV_PART_MAIN);
     lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_font_14, 0);
     lv_obj_add_style(m_uartStateUI.UartTxTextArea, &style_nofocus_bg, 0);
+}
+
+void FunctionUartState::onEnter()
+{
+    m_currentSelection = -1;
+
+    if (m_uartStateUI.Screen != nullptr) {
+        if (lv_scr_act() != m_uartStateUI.Screen) {
+            lv_scr_load(m_uartStateUI.Screen);
+        }
+        return;
+    }
+
+    m_uartStateUI.Screen = lv_obj_create(NULL);
+    lv_obj_add_style(m_uartStateUI.Screen, &style_screen, 0);
+
+    createOptionBarUI();
+    createLedUI();
+    createMessageUI();
 
     lv_obj_add_flag(m_uartStateUI.UartRxGroup, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(m_uartStateUI.UartTxGroup, LV_OBJ_FLAG_HIDDEN);
