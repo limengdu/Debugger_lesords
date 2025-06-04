@@ -16,11 +16,15 @@ extern lv_style_t style_focus_uart_line;
 extern lv_style_t style_font_18;
 extern lv_style_t style_font_12;
 extern lv_style_t style_font_14;
+extern lv_style_t style_font_16;
 extern lv_style_t style_font_20;
 extern lv_style_t style_font_22;
+extern lv_style_t style_font_26;
 extern lv_style_t style_font_28;
+extern lv_style_t style_font_30;
 extern lv_style_t style_font_32;
 extern lv_style_t style_font_36;
+extern lv_style_t style_font_48;
 
 
 void initStyle();

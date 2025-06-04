@@ -10,8 +10,40 @@
 #define POWER_INTERFACE_2  1
 #define POWER_INTERFACE_3  2
 
-struct PowerStateUI {
+struct POWER_STATE_SIMPLE_T {
+    lv_obj_t* voltage;
+    lv_obj_t* current;
+    lv_obj_t* power;
+};
+
+struct POWER_STATE_MEDIUM_T {
+    lv_obj_t* voltage;
+    lv_obj_t* current_A;
+    lv_obj_t* current_mA;
+    lv_obj_t* current_uA;
+    lv_obj_t* power_W;
+    lv_obj_t* power_mW;
+};
+
+struct POWER_STATE_COMPLEX_T {
+    lv_obj_t* voltage;
+    lv_obj_t* current;
+    lv_obj_t* power;
+
+    lv_obj_t* viewGroup;
+    lv_obj_t* minCurrent_A;
+    lv_obj_t* minPower_Wh;
+    lv_obj_t* maxCurrent_A;
+    lv_obj_t* maxPower_Wh;
+    lv_obj_t* totalCurrent_Ah;
+    lv_obj_t* totalPower_Wh;
+
+    lv_obj_t* time;
+};
+
+struct POWER_STATE_UI_T {
     lv_obj_t* Screen;
+    lv_obj_t* powerGroup[3];
 
     lv_obj_t *voltageLabel_V;
     lv_obj_t *currentLabel_A;
@@ -29,6 +61,10 @@ struct PowerStateUI {
     lv_obj_t *totalLabel_wh;
     lv_obj_t *totalLabel_Ah;
     lv_obj_t *timeLabel;
+
+    POWER_STATE_SIMPLE_T powerSimple;
+    POWER_STATE_MEDIUM_T powerMedium;
+    POWER_STATE_COMPLEX_T powerComplex;
 };
 
 //! todo 具体检测电流电压这些值
@@ -49,16 +85,15 @@ public:
     const char* getName() const override;
     bool handleEvent(StateMachine* machine, const Event* event) override;
 
-    void compute(float vol,float cur,float pow);
-    void powerInterface_1();
-    void powerInterface_2();
-    void powerInterface_3();
+    void createPowerSimpleUI();
+    void createPowerMediumUI();
+    void createPowerComplexUI();
 
-    void clearScreen();
+    void compute(float vol,float cur,float pow);
 
 private:
     // lv_obj_t *m_titleLabel;
-    PowerStateUI m_powerStateUI;
+    POWER_STATE_UI_T m_powerStateUI;
     bool m_isFirstFlag;
     // 100ms 转换为小时，因为 updateDisplay() 每隔 100ms 刷新一次
     static constexpr float m_timeInterval = 1.0f / 36000.0f;
@@ -76,8 +111,8 @@ private:
     float m_totalPower;
 
     // 界面数组
-    InterfaceFunction interfaceFunctions[3];
-    int currentInterfaceIndex;
+    int m_currentIndex;
+    int m_update;
     unsigned long startTime;
 };
 

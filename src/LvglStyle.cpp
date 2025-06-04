@@ -13,11 +13,15 @@ lv_style_t style_focus_uart_line;
 lv_style_t style_font_18;
 lv_style_t style_font_12;
 lv_style_t style_font_14;
+lv_style_t style_font_16;
 lv_style_t style_font_20;
 lv_style_t style_font_22;
+lv_style_t style_font_26;
 lv_style_t style_font_28;
 lv_style_t style_font_32;
+lv_style_t style_font_30;
 lv_style_t style_font_36;
+lv_style_t style_font_48;
 
 void initStyle() {
     lv_style_init(&style_screen);
@@ -82,6 +86,9 @@ void initStyle() {
     lv_style_init(&style_font_14);
     lv_style_set_text_font(&style_font_14, &lv_font_montserrat_14);
 
+    lv_style_init(&style_font_16);
+    lv_style_set_text_font(&style_font_16, &lv_font_montserrat_16);
+
     lv_style_init(&style_font_18);
     lv_style_set_text_font(&style_font_18, &lv_font_montserrat_18);
 
@@ -91,12 +98,21 @@ void initStyle() {
     lv_style_init(&style_font_22);
     lv_style_set_text_font(&style_font_22, &lv_font_montserrat_22);
 
+    lv_style_init(&style_font_26);
+    lv_style_set_text_font(&style_font_26, &lv_font_montserrat_26);
+
     lv_style_init(&style_font_28);
     lv_style_set_text_font(&style_font_28, &lv_font_montserrat_28);
+
+    lv_style_init(&style_font_30);
+    lv_style_set_text_font(&style_font_30, &lv_font_montserrat_30);
 
     lv_style_init(&style_font_32);
     lv_style_set_text_font(&style_font_32, &lv_font_montserrat_32);
 
     lv_style_init(&style_font_36);
     lv_style_set_text_font(&style_font_36, &lv_font_montserrat_36);
+
+    lv_style_init(&style_font_48);
+    lv_style_set_text_font(&style_font_48, &lv_font_montserrat_48);
 }
