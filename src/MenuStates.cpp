@@ -249,7 +249,6 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     }
 
     ina228 = display->getINA228();
-    display->updateShuntOfINA();
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     cur = _max(0.0, ina228->readCurrent() / 1000);
     power = vol * cur;
