@@ -37,6 +37,8 @@ private:
     BAUD_STATE_UI_T m_baudStateUI;
     uint m_baudRateList[NUM_BAUDRATES] = {4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
     uint8_t m_currentBaudIndex;
+    uint8_t m_currentLedIndex;
+    bool m_exit;
 };
 
 #endif // FUNCTION_BAUD_STATE_H

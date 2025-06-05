@@ -52,8 +52,12 @@ public:
         return m_ina228;
     }
 
-    void updateBaudLED(int baudIndex) {
-        byte dataA = 0B00000001, dataB = 0B10000100;
+    void updateBaudLED(int baudIndex, bool background = true) {
+        byte dataA = 0B00000000, dataB = 0B10000000;
+
+        if (!background) {
+            dataB = 0B00000000;
+        }
 
         if (baudIndex <= 6) {
             dataA |= 2 << baudIndex;

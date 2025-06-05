@@ -2,7 +2,9 @@
 
 FunctionBaudState::FunctionBaudState()
     : FunctionState("FunctionBaudState"),
-      m_currentBaudIndex(1)
+      m_currentBaudIndex(1),
+      m_currentLedIndex(1),
+      m_exit(false)
 {
     m_baudStateUI.screen = nullptr;
     m_baudStateUI.roller = nullptr;
@@ -14,6 +16,8 @@ FunctionBaudState::FunctionBaudState()
 
 void FunctionBaudState::onEnter()
 {
+    m_exit = false;
+
     if (m_baudStateUI.screen != nullptr) {
         if (lv_scr_act() != m_baudStateUI.screen) {
             lv_scr_load(m_baudStateUI.screen);
@@ -104,6 +108,8 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
                     m_baudRate = m_baudRateList[m_currentBaudIndex];
+                    m_currentLedIndex = m_currentBaudIndex;
+                    m_exit = true;
                     machine->requestDisplayUpdate();
                     machine->changeState(nextState);
                     break;
@@ -118,6 +124,8 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
                 int stateId = FunctionUartState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
+                    m_exit = true;
+                    machine->requestDisplayUpdate();
                     machine->changeState(nextState);
                     break;
                 }
@@ -138,8 +146,17 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
         return;
     }
 
-    if (m_baudRate == m_baudRateList[m_currentBaudIndex]) {
-        display->updateBaudLED(m_currentBaudIndex);
+    static bool background = true;
+    static int lastTime = millis();
+
+    if (m_exit) {
+        background = false;
+    }
+    display->updateBaudLED(m_currentLedIndex, background);
+
+    if (millis() - lastTime >= 1000) {
+        background = !background;
+        lastTime = millis();
     }
 }
 
