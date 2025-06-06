@@ -65,6 +65,7 @@ public:
     void onEnter() override;
     void onExit() override;
     // 特定实现
+    void updateLedEffect();
     void updateDisplay(DisplayContext* display) override;
     int getID() const override;
     const char* getName() const override;

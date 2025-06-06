@@ -18,23 +18,27 @@ FunctionUartState::FunctionUartState()
         2,
         &m_uartTask
     );
+
+    vTaskSuspend(m_uartTask);
 }
 
 void FunctionUartState::uartTaskFunc(void* params) {
 
     while (true) {
+        // RX, From XIAO to Debugger
         if (COMSerial.available()) {
             char c = COMSerial.read();
             sprintf(FunctionUartState::rxBuff, "%c", c);
             ShowSerial.write(c);
         }
 
+        // TX, From PC to XIAO
         if (ShowSerial.available()) {
             char c = ShowSerial.read();
             COMSerial.write(c);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -226,6 +230,7 @@ void FunctionUartState::onEnter()
     if (m_uartStateUI.Screen != nullptr) {
         if (lv_scr_act() != m_uartStateUI.Screen) {
             lv_scr_load(m_uartStateUI.Screen);
+            vTaskResume(m_uartTask);
         }
         return;
     }
@@ -241,11 +246,13 @@ void FunctionUartState::onEnter()
     lv_obj_add_flag(m_uartStateUI.UartTxGroup, LV_OBJ_FLAG_HIDDEN);
 
     lv_scr_load(m_uartStateUI.Screen);
+
+    vTaskResume(m_uartTask);
 }
 
 void FunctionUartState::onExit()
 {
-
+    vTaskSuspend(m_uartTask);
 }
 
 bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
@@ -315,6 +322,49 @@ bool FunctionUartState::handleEvent(StateMachine* machine, const Event* event)
     return true;
 }
 
+void FunctionUartState::updateLedEffect() {
+    static int rxPos = 4, txPos = 0;
+    static int time = millis();
+    int lastPos = 0;
+
+    // RX, 4 -> 0, Light up from both sides to the middle
+    if (COMSerial.available()) {
+        if (millis() - time >= 1000) {
+            lv_led_on(m_uartStateUI.UartRxLedLeftList[rxPos]);
+            lv_led_on(m_uartStateUI.UartRxLedRightList[rxPos]);
+
+            lastPos = (rxPos <= 3) ? (rxPos + 1) : 0;
+            lv_led_off(m_uartStateUI.UartRxLedLeftList[lastPos]);
+            lv_led_off(m_uartStateUI.UartRxLedRightList[lastPos]);
+
+            if (--rxPos < 0) rxPos = 4;
+        }
+    } else {
+        lastPos = (rxPos <= 3) ? (rxPos + 1) : 0;
+        lv_led_off(m_uartStateUI.UartRxLedLeftList[lastPos]);
+        lv_led_off(m_uartStateUI.UartRxLedRightList[lastPos]);
+        rxPos = 0;
+    }
+
+    // TX, 0 -> 4, Light up from the middle to both sides
+    if (ShowSerial.available()) {
+        if (millis() - time >= 1000) {
+            lv_led_on(m_uartStateUI.UartTxLedLeftList[txPos]);
+            lv_led_on(m_uartStateUI.UartTxLedRightList[txPos]);
+
+            lastPos = (txPos >= 1) ? (txPos - 1) : 4;
+            lv_led_off(m_uartStateUI.UartTxLedLeftList[lastPos]);
+            lv_led_off(m_uartStateUI.UartTxLedRightList[lastPos]);
+
+            if (++txPos > 4) txPos = 0;
+        }
+    } else {
+        lastPos = (txPos >= 1) ? (txPos - 1) : 4;
+        lv_led_off(m_uartStateUI.UartTxLedLeftList[lastPos]);
+        lv_led_off(m_uartStateUI.UartTxLedRightList[lastPos]);
+    }
+}
+
 void FunctionUartState::updateDisplay(DisplayContext* display) {
     if (!display) {
         return;
@@ -359,6 +409,7 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
     }
 
     if (!m_isUartInfoDisplay) {
+        updateLedEffect();
         return;
     }
 
