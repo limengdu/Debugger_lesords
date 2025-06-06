@@ -102,6 +102,7 @@ void FunctionUartState::createLedUI() {
     lv_obj_add_style(label, &style_font_28, 0);
 
     // LED List
+    // Left Part, start from the middle to the left
     int xPos = 60;
     for (int i = 0; i < 5; i++) {
         // TX
@@ -109,20 +110,21 @@ void FunctionUartState::createLedUI() {
         lv_obj_set_pos(m_uartStateUI.UartRxLedLeftList[i], xPos, 14 + i);
         lv_led_off(m_uartStateUI.UartRxLedLeftList[i]);
         lv_led_set_color(m_uartStateUI.UartRxLedLeftList[i], lv_color_hex(0xDDE62F));
-        lv_obj_set_style_width(m_uartStateUI.UartRxLedLeftList[i], 10 - (i * 2), 0);
-        lv_obj_set_style_height(m_uartStateUI.UartRxLedLeftList[i], 10 - (i * 2), 0);
+        lv_obj_set_size(m_uartStateUI.UartRxLedLeftList[i], 10 - (i * 2), 10 - (i * 2));
+        lv_obj_add_style(m_uartStateUI.UartRxLedLeftList[i], &style_led, 0);
 
         // RX
         m_uartStateUI.UartTxLedLeftList[i] = lv_led_create(m_uartStateUI.UartTxLEDGroup);
         lv_obj_set_pos(m_uartStateUI.UartTxLedLeftList[i], xPos, 14 + i);
         lv_led_off(m_uartStateUI.UartTxLedLeftList[i]);
         lv_led_set_color(m_uartStateUI.UartTxLedLeftList[i], lv_color_hex(0x2FE6AC));
-        lv_obj_set_style_width(m_uartStateUI.UartTxLedLeftList[i], 10 - (i * 2), 0);
-        lv_obj_set_style_height(m_uartStateUI.UartTxLedLeftList[i], 10 - (i * 2), 0);
+        lv_obj_set_size(m_uartStateUI.UartTxLedLeftList[i], 10 - (i * 2), 10 - (i * 2));
+        lv_obj_add_style(m_uartStateUI.UartTxLedLeftList[i], &style_led, 0);
 
         xPos -= 18 - (i * 2);
     }
 
+    // Right Part, start from the middle to the right
     xPos = 124;
     for (int i = 0; i < 5; i++) {
         // TX
@@ -130,16 +132,16 @@ void FunctionUartState::createLedUI() {
         lv_obj_set_pos(m_uartStateUI.UartRxLedRightList[i], xPos, 14 + i);
         lv_led_off(m_uartStateUI.UartRxLedRightList[i]);
         lv_led_set_color(m_uartStateUI.UartRxLedRightList[i], lv_color_hex(0xDDE62F));
-        lv_obj_set_style_width(m_uartStateUI.UartRxLedRightList[i], 10 - (i * 2), 0);
-        lv_obj_set_style_height(m_uartStateUI.UartRxLedRightList[i], 10 - (i * 2), 0);
+        lv_obj_set_size(m_uartStateUI.UartRxLedRightList[i], 10 - (i * 2), 10 - (i * 2));
+        lv_obj_add_style(m_uartStateUI.UartRxLedRightList[i], &style_led, 0);
 
         // RX
         m_uartStateUI.UartTxLedRightList[i] = lv_led_create(m_uartStateUI.UartTxLEDGroup);
         lv_obj_set_pos(m_uartStateUI.UartTxLedRightList[i], xPos, 14 + i);
         lv_led_off(m_uartStateUI.UartTxLedRightList[i]);
         lv_led_set_color(m_uartStateUI.UartTxLedRightList[i], lv_color_hex(0x2FE6AC));
-        lv_obj_set_style_width(m_uartStateUI.UartTxLedRightList[i], 10 - (i * 2), 0);
-        lv_obj_set_style_height(m_uartStateUI.UartTxLedRightList[i], 10 - (i * 2), 0);
+        lv_obj_set_size(m_uartStateUI.UartTxLedRightList[i], 10 - (i * 2), 10 - (i * 2));
+        lv_obj_add_style(m_uartStateUI.UartTxLedRightList[i], &style_led, 0);
 
         xPos += 18 - (i * 2);
     }
@@ -164,8 +166,7 @@ void FunctionUartState::createMessageUI() {
     lv_obj_set_pos(m_uartStateUI.UartRxLed, 8, 28);
     lv_led_on(m_uartStateUI.UartRxLed);
     lv_led_set_color(m_uartStateUI.UartRxLed, lv_color_hex(0xDDE62F));
-    lv_obj_set_style_width(m_uartStateUI.UartRxLed, 10, 0);
-    lv_obj_set_style_height(m_uartStateUI.UartRxLed, 10, 0);
+    lv_obj_add_style(m_uartStateUI.UartRxLed, &style_led, 0);
 
     // RX Area
     m_uartStateUI.UartRxBg= lv_obj_create(m_uartStateUI.UartRxGroup);
@@ -200,8 +201,7 @@ void FunctionUartState::createMessageUI() {
     lv_obj_set_pos(m_uartStateUI.UartTxLed, 8, 28);
     lv_led_on(m_uartStateUI.UartTxLed);
     lv_led_set_color(m_uartStateUI.UartTxLed, lv_color_hex(0x2FE6AC));
-    lv_obj_set_style_width(m_uartStateUI.UartTxLed, 10, 0);
-    lv_obj_set_style_height(m_uartStateUI.UartTxLed, 10, 0);
+    lv_obj_add_style(m_uartStateUI.UartTxLed, &style_led, 0);
 
     // TX Area
     m_uartStateUI.UartTxBg = lv_obj_create(m_uartStateUI.UartTxGroup);

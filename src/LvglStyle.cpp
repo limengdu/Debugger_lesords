@@ -67,8 +67,10 @@ void initStyle() {
     lv_style_set_border_color(&style_nofocus_uart_bg, lv_color_hex(0x000000));
 
     lv_style_init(&style_led);
-    lv_style_set_width(&style_led, 10);
-    lv_style_set_height(&style_led, 10);
+    lv_style_set_size(&style_led, 10, 10);
+    lv_style_set_shadow_width(&style_led, 0);
+    lv_style_set_shadow_spread(&style_led, 0);
+    lv_style_set_border_width(&style_led, 0);
 
     lv_style_init(&style_uart_line);
     lv_style_set_line_color(&style_uart_line, lv_palette_main(LV_PALETTE_GREY));
