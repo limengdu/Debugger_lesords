@@ -40,6 +40,7 @@ Adafruit_USBD_HID usb_hid;
 
 static uint8_t USB_Request[DAP_PACKET_COUNT][DAP_PACKET_SIZE];  // Request  Buffer
 uint8_t rawhidResponse[DAP_PACKET_SIZE];
+bool daplinkStatus = true;
 
 #define FREE_COUNT_INIT          (DAP_PACKET_COUNT)
 #define SEND_COUNT_INIT          0
@@ -73,7 +74,14 @@ void initDapLink(bool blocked) {
 
     if (blocked) {
         // wait until device mounted
-        while( !USBDevice.mounted() ) delay(1);
+        int cnt = 0;
+        while( !USBDevice.mounted() ) {
+            delay(10);
+            if (++cnt >= 300) {
+                daplinkStatus = false;
+                break;
+            }
+        }
     }
 
     DAP_Setup();

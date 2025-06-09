@@ -35,5 +35,6 @@ label = nullptr;       \
 }
 
 extern unsigned long startTime;
+extern bool daplinkStatus;
 
 #endif

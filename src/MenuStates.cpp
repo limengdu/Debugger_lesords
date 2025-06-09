@@ -60,11 +60,15 @@ void MainMenuState::onEnter() {
     lv_obj_set_style_text_color(label, lv_color_hex(0xACE62F), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_28, 0);
 
-    lv_obj_t* led_title = lv_led_create(m_mainMenu.screen);
-    lv_obj_set_pos(led_title, 55 + 12 + 50 + 110 + 3, 28);
-    lv_led_on(led_title);
-    lv_led_set_color(led_title, lv_color_hex(0xACE62F));
-    lv_obj_add_style(led_title, &style_led, 0);
+    m_mainMenu.ledTitle = lv_led_create(m_mainMenu.screen);
+    lv_obj_set_pos(m_mainMenu.ledTitle, 55 + 12 + 50 + 110 + 3, 28);
+    lv_led_on(m_mainMenu.ledTitle);
+    if (daplinkStatus) {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xACE62F));
+    } else {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xFF0000));
+    }
+    lv_obj_add_style(m_mainMenu.ledTitle, &style_led, 0);
 
     // Left Block
     m_mainMenu.uart_bg = lv_obj_create(m_mainMenu.screen);
@@ -80,11 +84,11 @@ void MainMenuState::onEnter() {
     lv_obj_add_style(label, &style_font_12, 0);
 
     // Baud Value
-    m_mainMenu.baud_value = lv_label_create(m_mainMenu.uart_bg);
-    lv_label_set_text(m_mainMenu.baud_value, "9600");
-    lv_obj_set_pos(m_mainMenu.baud_value, 13, 33);
-    lv_obj_set_style_text_color(m_mainMenu.baud_value, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-    lv_obj_add_style(m_mainMenu.baud_value, &style_font_20, 0);
+    m_mainMenu.baudRate = lv_label_create(m_mainMenu.uart_bg);
+    lv_label_set_text(m_mainMenu.baudRate, "9600");
+    lv_obj_set_pos(m_mainMenu.baudRate, 13, 33);
+    lv_obj_set_style_text_color(m_mainMenu.baudRate, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_add_style(m_mainMenu.baudRate, &style_font_20, 0);
 
     // RX
     label = lv_label_create(m_mainMenu.uart_bg);
@@ -93,11 +97,11 @@ void MainMenuState::onEnter() {
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
 
-    lv_obj_t* led_RX = lv_led_create(m_mainMenu.uart_bg);
-    lv_obj_set_pos(led_RX, 45, 77);
-    lv_led_on(led_RX);
-    lv_led_set_color(led_RX, lv_color_hex(0xDDE62F));
-    lv_obj_add_style(led_RX, &style_led, 0);
+    m_mainMenu.ledRx = lv_led_create(m_mainMenu.uart_bg);
+    lv_obj_set_pos(m_mainMenu.ledRx, 45, 77);
+    lv_led_off(m_mainMenu.ledRx);
+    lv_led_set_color(m_mainMenu.ledRx, lv_color_hex(0xDDE62F));
+    lv_obj_add_style(m_mainMenu.ledRx, &style_led, 0);
 
     // TX
     label = lv_label_create(m_mainMenu.uart_bg);
@@ -106,11 +110,11 @@ void MainMenuState::onEnter() {
     lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_18, 0);
 
-    lv_obj_t* led_TX = lv_led_create(m_mainMenu.uart_bg);
-    lv_obj_set_pos(led_TX, 45, 115);
-    lv_led_on(led_TX);
-    lv_led_set_color(led_TX, lv_color_hex(0x2FE6AC));
-    lv_obj_add_style(led_TX, &style_led, 0);
+    m_mainMenu.ledTx = lv_led_create(m_mainMenu.uart_bg);
+    lv_obj_set_pos(m_mainMenu.ledTx, 45, 115);
+    lv_led_off(m_mainMenu.ledTx);
+    lv_led_set_color(m_mainMenu.ledTx, lv_color_hex(0x2FE6AC));
+    lv_obj_add_style(m_mainMenu.ledTx, &style_led, 0);
 
     // Right Block
     m_mainMenu.power_bg = lv_obj_create(m_mainMenu.screen);
@@ -248,12 +252,26 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
         lv_obj_add_style(m_mainMenu.power_bg, &style_focus_bg, 0);
     }
 
+    // RX
+    if (COMSerial.available()) {
+        lv_led_on(m_mainMenu.ledRx);
+    } else {
+        lv_led_off(m_mainMenu.ledRx);
+    }
+
+    // TX
+    if (ShowSerial.available()) {
+        lv_led_on(m_mainMenu.ledTx);
+    } else {
+        lv_led_off(m_mainMenu.ledTx);
+    }
+
     ina228 = display->getINA228();
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     cur = _max(0.0, ina228->readCurrent() / 1000);
     power = vol * cur;
 
-    lv_label_set_text_fmt(m_mainMenu.baud_value, "%d", FunctionBaudState::m_baudRate);
+    lv_label_set_text_fmt(m_mainMenu.baudRate, "%d", FunctionBaudState::m_baudRate);
 
     snprintf(value, sizeof(value), "%.4f", vol);
     lv_label_set_text(m_mainMenu.vol, value);
