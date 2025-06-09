@@ -107,9 +107,8 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
                 int stateId = FunctionUartState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
-                    m_baudRate = m_baudRateList[m_currentBaudIndex];
-                    m_currentLedIndex = m_currentBaudIndex;
                     m_exit = true;
+                    changeBaudRate();
                     machine->requestDisplayUpdate();
                     machine->changeState(nextState);
                     break;
@@ -176,6 +175,17 @@ void FunctionBaudState::scroll_anim(lv_obj_t* obj, int32_t v)
     lv_anim_set_exec_cb(&anim, scroll_x_anim);
     lv_anim_set_path_cb(&anim, lv_anim_path_linear);
     lv_anim_start(&anim);
+}
+
+void FunctionBaudState::changeBaudRate()
+{
+    m_baudRate = m_baudRateList[m_currentBaudIndex];
+    m_currentLedIndex = m_currentBaudIndex;
+
+    ShowSerial.end();
+    COMSerial.end();
+    ShowSerial.begin(m_baudRate);
+    COMSerial.begin(m_baudRate);
 }
 
 int FunctionBaudState::getID() const

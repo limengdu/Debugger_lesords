@@ -41,8 +41,8 @@ static uint32_t my_tick(void) {
 }
 
 void initSerial() {
-    ShowSerial.begin(9600);
-    COMSerial.begin(9600);
+    ShowSerial.begin(FunctionBaudState::m_baudRate);
+    COMSerial.begin(FunctionBaudState::m_baudRate);
 
     pinMode(UART_SWITCH, OUTPUT);
     digitalWrite(UART_SWITCH, LOW);

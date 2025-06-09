@@ -25,6 +25,7 @@ public:
     // 特定实现
     virtual void updateDisplay(DisplayContext* display);
     void scroll_anim(lv_obj_t* obj, int32_t v);
+    void changeBaudRate();
     int getID() const override;
     const char* getName() const override;
     void onEnter() override;
