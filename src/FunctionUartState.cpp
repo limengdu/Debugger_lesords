@@ -10,6 +10,9 @@ FunctionUartState::FunctionUartState()
       m_uartStateUI(),
       m_uartTask(nullptr)
 {
+    m_rxQueue = xQueueCreate(UART_DATA_SIZE, sizeof(char));
+    m_txQueue = xQueueCreate(UART_DATA_SIZE, sizeof(char));
+
     xTaskCreate(
         uartTaskFunc,
         "UartTask",
@@ -23,19 +26,28 @@ FunctionUartState::FunctionUartState()
 }
 
 void FunctionUartState::uartTaskFunc(void* params) {
+    FunctionUartState* uartState = static_cast<FunctionUartState*> (params);
 
     while (true) {
         // RX, From XIAO to Debugger
         if (COMSerial.available()) {
             char c = COMSerial.read();
-            sprintf(FunctionUartState::rxBuff, "%c", c);
-            ShowSerial.write(c);
+
+            if (uartState->m_isUartInfoDisplay) {
+                xQueueSendToBack(uartState->m_rxQueue, &c, 0);
+            } else {
+                ShowSerial.write(c);
+            }
         }
 
         // TX, From PC to XIAO
         if (ShowSerial.available()) {
             char c = ShowSerial.read();
+
             COMSerial.write(c);
+            if (uartState->m_isUartInfoDisplay) {
+                xQueueSendToBack(uartState->m_txQueue, &c, 0);
+            }
         }
 
         vTaskDelay(pdMS_TO_TICKS(30));
@@ -168,7 +180,7 @@ void FunctionUartState::createMessageUI() {
     // RX LED
     m_uartStateUI.UartRxLed = lv_led_create(m_uartStateUI.UartRxGroup);
     lv_obj_set_pos(m_uartStateUI.UartRxLed, 8, 28);
-    lv_led_on(m_uartStateUI.UartRxLed);
+    lv_led_off(m_uartStateUI.UartRxLed);
     lv_led_set_color(m_uartStateUI.UartRxLed, lv_color_hex(0xDDE62F));
     lv_obj_add_style(m_uartStateUI.UartRxLed, &style_led, 0);
 
@@ -203,7 +215,7 @@ void FunctionUartState::createMessageUI() {
     // TX LED
     m_uartStateUI.UartTxLed = lv_led_create(m_uartStateUI.UartTxGroup);
     lv_obj_set_pos(m_uartStateUI.UartTxLed, 8, 28);
-    lv_led_on(m_uartStateUI.UartTxLed);
+    lv_led_off(m_uartStateUI.UartTxLed);
     lv_led_set_color(m_uartStateUI.UartTxLed, lv_color_hex(0x2FE6AC));
     lv_obj_add_style(m_uartStateUI.UartTxLed, &style_led, 0);
 
@@ -329,7 +341,7 @@ void FunctionUartState::updateLedEffect() {
 
     // RX, 4 -> 0, Light up from both sides to the middle
     if (COMSerial.available()) {
-        if (millis() - time >= 1000) {
+        if (millis() - time >= 300) {
             lv_led_on(m_uartStateUI.UartRxLedLeftList[rxPos]);
             lv_led_on(m_uartStateUI.UartRxLedRightList[rxPos]);
 
@@ -343,12 +355,11 @@ void FunctionUartState::updateLedEffect() {
         lastPos = (rxPos <= 3) ? (rxPos + 1) : 0;
         lv_led_off(m_uartStateUI.UartRxLedLeftList[lastPos]);
         lv_led_off(m_uartStateUI.UartRxLedRightList[lastPos]);
-        rxPos = 0;
     }
 
     // TX, 0 -> 4, Light up from the middle to both sides
     if (ShowSerial.available()) {
-        if (millis() - time >= 1000) {
+        if (millis() - time >= 300) {
             lv_led_on(m_uartStateUI.UartTxLedLeftList[txPos]);
             lv_led_on(m_uartStateUI.UartTxLedRightList[txPos]);
 
@@ -373,6 +384,7 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
     lv_label_set_text_fmt(m_uartStateUI.UartTypeLabel, "%s", (m_uartType == UartType::UART_TYPE_XIAO) ? "XIAO" : "Grove");
     lv_label_set_text_fmt(m_uartStateUI.UartBaudLabel, "%d", FunctionBaudState::m_baudRate);
 
+    // Determine the displayed interface content based on the status
     if (m_isUartInfoDisplay) {
         lv_obj_add_flag(m_uartStateUI.UartRxLEDGroup, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(m_uartStateUI.UartTxLEDGroup, LV_OBJ_FLAG_HIDDEN);
@@ -385,6 +397,7 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
         lv_obj_remove_flag(m_uartStateUI.UartTxLEDGroup, LV_OBJ_FLAG_HIDDEN);
     }
 
+    // Determine the highlighted option based on the state
     if (m_currentSelection == -1) {
         lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_nofocus_uart_bg, 0);
         lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
@@ -401,41 +414,75 @@ void FunctionUartState::updateDisplay(DisplayContext* display) {
         lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
     } else if (m_currentSelection == 1) {
         lv_obj_add_style(m_uartStateUI.UartTypeBg, &style_nofocus_uart_bg, 0);
-    lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+        lv_obj_set_style_text_color(m_uartStateUI.UartTypeLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
 
         lv_obj_add_style(m_uartStateUI.UartBaudBg, &style_focus_uart_bg, 0);
         lv_obj_add_style(m_uartStateUI.UartBaudLine, &style_focus_uart_line, 0);
         lv_obj_set_style_text_color(m_uartStateUI.UartBaudLabel, lv_color_hex(0xACE62F), LV_PART_MAIN);
     }
 
+    // Display the marquee effect according to the status
     if (!m_isUartInfoDisplay) {
         updateLedEffect();
         return;
     }
 
-    // 获取当前时间戳（毫秒）
-    unsigned long timestamp = millis();
-    // 将时间戳格式化为字符串并更新 rxBuff 和 txBuff
-    char rxText[128];
-    snprintf(rxText, sizeof(rxText), "RX: %lu\n", timestamp);  // 模拟接收数据，添加换行符
-
-    // 获取当前 UartRxTextArea 的文本内容
-    const char* currentRxText = lv_textarea_get_text(m_uartStateUI.UartRxTextArea);
-    // 定义一个足够大的缓冲区来拼接新数据
-    char combinedRxText[1024];
-    snprintf(combinedRxText, sizeof(combinedRxText), "%s%s", currentRxText, rxText);
-    // 定义最大显示长度，超过该长度则截断前面的内容
+    // Rx Area
     const int MAX_DISPLAY_LENGTH = 90;
+    const char* currentRxText = lv_textarea_get_text(m_uartStateUI.UartRxTextArea);
+    char combinedRxText[256], rxText[50];
+    int rxTextPos = 0;
+
+    while (rxTextPos < 49) {
+        if (xQueueReceive(m_rxQueue, &rxText[rxTextPos], (TickType_t) 10) != pdTRUE) {
+            break;
+        }
+        ++rxTextPos;
+    }
+    rxText[rxTextPos] = '\0';
+    snprintf(combinedRxText, sizeof(combinedRxText), "%s%s", currentRxText, rxText);
+
     if (strlen(combinedRxText) > MAX_DISPLAY_LENGTH) {
         memmove(combinedRxText, combinedRxText + strlen(combinedRxText) - MAX_DISPLAY_LENGTH, MAX_DISPLAY_LENGTH + 1);
     }
-    // 更新 UartRxTextArea 的文本内容
-    lv_textarea_set_text(m_uartStateUI.UartRxTextArea, combinedRxText);
 
-    // 将 UartRxTextArea 滚动到末尾，确保显示最新数据
+    // Determine whether to display the status light based on the status
+    if (rxTextPos == 0) {
+        lv_led_off(m_uartStateUI.UartRxLed);
+    } else {
+        lv_led_on(m_uartStateUI.UartRxLed);
+    }
+
+    lv_textarea_set_text(m_uartStateUI.UartRxTextArea, combinedRxText);
     lv_obj_scroll_to_y(m_uartStateUI.UartRxTextArea, LV_COORD_MAX, LV_ANIM_ON);
 
-    lv_textarea_set_text(m_uartStateUI.UartTxTextArea, txBuff);
+    // Tx Area
+    const char* currentTxText = lv_textarea_get_text(m_uartStateUI.UartTxTextArea);
+    char combinedTxText[256], txText[50];
+    int txTextPos = 0;
+
+    while (txTextPos < 49) {
+        if (xQueueReceive(m_txQueue, &txText[txTextPos], (TickType_t) 10) != pdTRUE) {
+            break;
+        }
+        ++txTextPos;
+    }
+    txText[txTextPos] = '\0';
+    snprintf(combinedTxText, sizeof(combinedTxText), "%s%s", currentTxText, txText);
+
+    if (strlen(combinedTxText) > MAX_DISPLAY_LENGTH) {
+        memmove(combinedTxText, combinedTxText + strlen(combinedTxText) - MAX_DISPLAY_LENGTH, MAX_DISPLAY_LENGTH + 1);
+    }
+
+    // Determine whether to display the status light based on the status
+    if (txTextPos == 0) {
+        lv_led_off(m_uartStateUI.UartTxLed);
+    } else {
+        lv_led_on(m_uartStateUI.UartTxLed);
+    }
+
+    lv_textarea_set_text(m_uartStateUI.UartTxTextArea, combinedTxText);
+    lv_obj_scroll_to_y(m_uartStateUI.UartTxTextArea, LV_COORD_MAX, LV_ANIM_ON);
 }
 
 int FunctionUartState::getID() const
@@ -458,6 +505,3 @@ void FunctionUartState::changeUartType()
         digitalWrite(UART_SWITCH, LOW);
     }
 }
-
-char FunctionUartState::rxBuff[UART_DATA_SIZE]="";
-char FunctionUartState::txBuff[UART_DATA_SIZE]="";

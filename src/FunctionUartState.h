@@ -46,6 +46,8 @@ private:
     UartType m_uartType;
     UartStateUI m_uartStateUI;
     TaskHandle_t m_uartTask;
+    QueueHandle_t m_rxQueue;
+    QueueHandle_t m_txQueue;
     int m_isUartInfoDisplay;
     int m_currentSelection;
 
@@ -53,10 +55,6 @@ private:
     void createOptionBarUI();
     void createLedUI();
     void createMessageUI();
-
-public:
-    static char rxBuff[UART_DATA_SIZE];
-    static char txBuff[UART_DATA_SIZE];
 
 public:
     enum { ID = 2 };
@@ -73,6 +71,5 @@ public:
     void changeUartType();
     virtual bool handleEvent(StateMachine* machine, const Event* event);
 };
-
 
 #endif //FUNCTIONUARTSTATE_H
