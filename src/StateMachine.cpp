@@ -61,7 +61,7 @@ bool StateMachine::start(UBaseType_t priority) {
     BaseType_t result = xTaskCreate(
         stateMachineTaskFunc,    // 任务函数
         "StateMachine",          // 任务名称
-        40960,                   // 堆栈大小，根据实际需求调整
+        8192,                    // 堆栈大小，根据实际需求调整
         this,                    // 传递给任务的参数
         priority,                // 任务优先级
         &m_stateMachineTask      // 任务句柄

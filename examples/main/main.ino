@@ -145,7 +145,10 @@ void setup() {
     // 初始化状态机，以主菜单为初始状态，错误状态为异常处理状态
     if (!stateMachine.init(mainMenu, errorState)) {
         // 初始化失败处理
-        while(1); // 或者重启系统
+        while(1) {
+            ShowSerial.printf("StateMachine init failed here\n");
+            delay(100);
+        }
     }
 
     inputTask.setStateMachine(&stateMachine);
@@ -153,14 +156,20 @@ void setup() {
     // 启动状态机任务
     if (!stateMachine.start(1)) {
         // 启动失败处理
-        while(1);
+        while(1) {
+            ShowSerial.printf("StateMachine start failed here\n");
+            delay(100);
+        }
     }
 
     // 启动输入任务
     if (!inputTask.start(2)) {
         // 启动失败处理
         stateMachine.stop();
-        while(1);
+        while(1) {
+            ShowSerial.printf("InputTask start failed here\n");
+            delay(100);
+        }
     }
 
     ShowSerial.printf("All settings are successful\n");
