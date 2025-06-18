@@ -42,7 +42,6 @@ static uint32_t my_tick(void) {
 }
 
 void initSerial() {
-    ShowSerial.begin(FunctionBaudState::m_baudRate);
     COMSerial.begin(FunctionBaudState::m_baudRate);
 
     pinMode(UART_SWITCH, OUTPUT);
@@ -107,6 +106,13 @@ void initLVGL() {
         1,
         nullptr
     );
+
+    while (true) {
+        if (stateMachine.getBootCompleted()) {
+            break;
+        }
+        delay(100);
+    }
 }
 
 void initINA228() {
@@ -139,6 +145,7 @@ void setup() {
     initLVGL();
     initStyle();
     initDapLink();
+    ShowSerial.begin(FunctionBaudState::m_baudRate);
     initINA228();
     pinMode(BOOT_BTN, INPUT_PULLUP);
     pinMode(ENCODER_PINA, INPUT);
