@@ -23,6 +23,7 @@ private:
     static void buttonTaskFunc(void* params);
 
 public:
+    EventType m_encoderSta;
     static ButtonAction m_buttonAction;
     
 public:
@@ -38,8 +39,11 @@ public:
     // 停止输入任务
     void stop();
 
-    //按钮中断处理函数
-    static void btnInterruptHandler(void);
+    // 按钮中断处理函数
+    static void IRAM_ATTR btnInterruptHandler();
+
+    // 滚轮中断处理函数
+    static void IRAM_ATTR wheelInterruptHandler(void* params);
 };
 
 #endif // INPUT_TASK_H
