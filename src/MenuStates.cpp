@@ -238,7 +238,7 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[10];
+    char value[7];
     float vol = 0, cur = 0, power = 0;
 
     if (m_currentSelection == -1) {

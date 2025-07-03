@@ -83,7 +83,7 @@ void FunctionPowerState::createPowerSimpleUI()
 void FunctionPowerState::createPowerMediumUI()
 {
     m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM] = lv_obj_create(m_powerStateUI.Screen);
-    lv_obj_set_size(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM], 186, 223);
+    lv_obj_set_size(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM], 200, 223);
     lv_obj_center(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_obj_add_style(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM], &style_screen, 0);
 
@@ -109,12 +109,13 @@ void FunctionPowerState::createPowerMediumUI()
     lv_label_set_text(m_powerStateUI.powerMedium.voltage, "0.0000");
     lv_obj_set_pos(m_powerStateUI.powerMedium.voltage, 30, 0);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.voltage, lv_color_hex(0xDDE62F), LV_PART_MAIN);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.voltage, 108, 0);
+    lv_obj_set_style_text_align(m_powerStateUI.powerMedium.voltage, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.voltage, 120, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.voltage, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "V");
-    lv_obj_set_pos(label, 148, 12);
+    lv_obj_set_pos(label, 160, 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0xDDE62F), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 
@@ -122,40 +123,41 @@ void FunctionPowerState::createPowerMediumUI()
     lv_label_set_text(m_powerStateUI.powerMedium.current_A, "0.0000");
     lv_obj_set_pos(m_powerStateUI.powerMedium.current_A, 30, 34);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.current_A, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_A, 108, 0);
+    lv_obj_set_style_text_align(m_powerStateUI.powerMedium.current_A, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_A, 120, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.current_A, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "A");
-    lv_obj_set_pos(label, 148, 34 + 12);
+    lv_obj_set_pos(label, 160, 34 + 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 
     m_powerStateUI.powerMedium.current_mA = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(m_powerStateUI.powerMedium.current_mA, "00.000");
     lv_obj_set_pos(m_powerStateUI.powerMedium.current_mA, 30, 71);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_mA, 108, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_mA, 120, 0);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.current_mA, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_set_style_text_align(m_powerStateUI.powerMedium.current_mA, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.current_mA, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "mA");
-    lv_obj_set_pos(label, 148, 71 + 12);
+    lv_obj_set_pos(label, 160, 71 + 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 
     m_powerStateUI.powerMedium.current_uA = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(m_powerStateUI.powerMedium.current_uA, "00000");
     lv_obj_set_pos(m_powerStateUI.powerMedium.current_uA, 30, 109);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_uA, 108, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.current_uA, 120, 0);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.current_uA, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_set_style_text_align(m_powerStateUI.powerMedium.current_uA, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.current_uA, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "uA");
-    lv_obj_set_pos(label, 148, 109 + 12);
+    lv_obj_set_pos(label, 160, 109 + 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2FE6AC), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 
@@ -163,26 +165,27 @@ void FunctionPowerState::createPowerMediumUI()
     lv_label_set_text(m_powerStateUI.powerMedium.power_W, "0.0000");
     lv_obj_set_pos(m_powerStateUI.powerMedium.power_W, 30, 146);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.power_W, lv_color_hex(0x2F8EE6), LV_PART_MAIN);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.power_W, 108, 0);
+    lv_obj_set_style_text_align(m_powerStateUI.powerMedium.power_W, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.power_W, 120, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.power_W, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "W");
-    lv_obj_set_pos(label, 148, 146 + 12);
+    lv_obj_set_pos(label, 160, 146 + 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2F8EE6), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 
     m_powerStateUI.powerMedium.power_mW = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(m_powerStateUI.powerMedium.power_mW, "00.0");
     lv_obj_set_pos(m_powerStateUI.powerMedium.power_mW, 30, 183);
-    lv_obj_set_style_width(m_powerStateUI.powerMedium.power_mW, 108, 0);
+    lv_obj_set_style_width(m_powerStateUI.powerMedium.power_mW, 120, 0);
     lv_obj_set_style_text_color(m_powerStateUI.powerMedium.power_mW, lv_color_hex(0x2F8EE6), LV_PART_MAIN);
     lv_obj_set_style_text_align(m_powerStateUI.powerMedium.power_mW, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_add_style(m_powerStateUI.powerMedium.power_mW, &style_font_30, 0);
 
     label = lv_label_create(m_powerStateUI.powerGroup[POWER_INTERFACE_MEDIUM]);
     lv_label_set_text(label, "mW");
-    lv_obj_set_pos(label, 148, 183 + 12);
+    lv_obj_set_pos(label, 160, 183 + 12);
     lv_obj_set_style_text_color(label, lv_color_hex(0x2F8EE6), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_16, 0);
 }
@@ -430,13 +433,16 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[10];
+    char value[7];
     float vol = 0, cur = 0, power = 0;
     static unsigned long lastTime = 0;
 
     ina228 = display->getINA228();
+    // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
+    // A
     cur = _max(0.0, ina228->readCurrent() / 1000);
+    // W
     power = vol * cur;
 
     if (m_currentIndex == POWER_INTERFACE_COMPLEX && !m_startTime) {
@@ -469,7 +475,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lv_label_set_text(m_powerStateUI.powerMedium.current_A, value);
             snprintf(value, sizeof(value), "%.3f", cur * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.current_mA, value);
-            snprintf(value, sizeof(value), "%.0f", cur * 1000 * 1000);
+            snprintf(value, sizeof(value), "%f", cur * 1000 * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.current_uA, value);
 
             snprintf(value, sizeof(value), "%.4f", power);
