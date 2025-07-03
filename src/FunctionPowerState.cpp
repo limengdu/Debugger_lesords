@@ -238,7 +238,7 @@ void FunctionPowerState::createPowerComplexUI()
 
     // Group
     m_powerStateUI.powerComplex.viewGroup = lv_obj_create(m_powerStateUI.powerGroup[POWER_INTERFACE_COMPLEX]);
-    lv_obj_set_size(m_powerStateUI.powerComplex.viewGroup, 273, 184);
+    lv_obj_set_size(m_powerStateUI.powerComplex.viewGroup, 260, 184);
     lv_obj_center(m_powerStateUI.powerComplex.viewGroup);
     lv_obj_add_style(m_powerStateUI.powerComplex.viewGroup, &style_screen, 0);
 
@@ -496,7 +496,9 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lastTime = currentTime;
 
             m_minCurrent = _min(m_minCurrent, cur);
+            m_minCurrent = _max(0, m_minCurrent);
             m_minPower = _min(m_minPower, power);
+            m_minPower = _max(0, m_minPower);
             m_maxCurrent = _max(m_maxCurrent, cur);
             m_maxPower = _max(m_maxPower, power);
 
