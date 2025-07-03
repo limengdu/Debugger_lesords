@@ -1,4 +1,5 @@
 #include "Global.h"
+#include "Tool.h"
 #include "MenuStates.h"
 #include "StateManager.h"
 #include "LvglStyle.h"
@@ -267,8 +268,12 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     }
 
     ina228 = display->getINA228();
+    // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
-    cur = _max(0.0, ina228->readCurrent() / 1000);
+    // A
+    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensationCurrent(ina228->readShuntVoltage() / 1000) / 1000);
+    cur = _max(0.0, cur + getCompensationOfTemp(cur / 1000, ina228->readDieTemp()));
+    // W
     power = vol * cur;
 
     lv_label_set_text_fmt(m_mainMenu.baudRate, "%d", FunctionBaudState::m_baudRate);

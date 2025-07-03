@@ -1,4 +1,5 @@
 #include "FunctionPowerState.h"
+#include "Tool.h"
 
 FunctionPowerState::FunctionPowerState()
     : FunctionState("FunctionPowerState"),
@@ -441,7 +442,8 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
-    cur = _max(0.0, ina228->readCurrent() / 1000);
+    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensationCurrent(ina228->readShuntVoltage() / 1000) / 1000);
+    cur = _max(0.0, cur + getCompensationOfTemp(cur / 1000, ina228->readDieTemp()));
     // W
     power = vol * cur;
 
