@@ -478,11 +478,12 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             snprintf(value, sizeof(value), "%.3f", cur * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.current_mA, value);
             snprintf(value, sizeof(value), "%f", cur * 1000 * 1000);
+            if (value[5] == '.') value[5] = '\0';
             lv_label_set_text(m_powerStateUI.powerMedium.current_uA, value);
 
             snprintf(value, sizeof(value), "%.4f", power);
             lv_label_set_text(m_powerStateUI.powerMedium.power_W, value);
-            snprintf(value, sizeof(value), "%.1f", power * 1000);
+            snprintf(value, sizeof(value), "%.4f", power * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.power_mW, value);
             break;
         }
