@@ -6,13 +6,13 @@ Here is the Debugger source code repository
 
 Libraries that must be downloaded
 
-- INA: https://github.com/adafruit/Adafruit_INA228
-
 - DAPLink: https://github.com/Lesords/Seeed_Arduino_DAPLink/tree/feat/ESP32S3
 
 - TFT: https://github.com/Lesords/TFT_eSPI/tree/feat/ST7789-EVT
 
-- LVGL: https://github.com/lvgl/lvgl
+- LVGL: https://github.com/Lesords/lvgl/tree/feat/Debugger
+
+- INA: https://github.com/adafruit/Adafruit_INA228
 
 - TinyUSB: https://github.com/adafruit/Adafruit_TinyUSB_Arduino
 
@@ -25,3 +25,30 @@ The following configuration needs to be modified to the corresponding options
 - `PSRAM` : "OPI PSRAM"
 
 - `USB Mode` : "USB-OTG (TinyUSB)"
+
+## Installation
+
+Download the following library in Arduino's library manager
+
+- Adafruit INA228 Library, Recommended version: 2.0.1
+
+- Adafruit TinyUSB Library, Recommended version: 3.4.4
+
+Download the following libraries through the command line
+
+```bash
+# Go to the library directory
+cd ~/Documents/Arduino/libraries
+
+# DAPLink
+git clone --depth 1 https://github.com/Lesords/Seeed_Arduino_DAPLink.git -b feat/ESP32S3
+
+# TFT
+git clone --depth 1 https://github.com/Lesords/TFT_eSPI.git -b feat/ST7789-EVT
+
+# LVGL
+git clone --depth 1 https://github.com/Lesords/lvgl.git -b feat/Debugger
+
+# Debugger
+git clone --depth 1 https://github.com/Lesords/Debugger.git
+```
