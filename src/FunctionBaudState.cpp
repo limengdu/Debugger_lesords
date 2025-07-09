@@ -86,18 +86,18 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
 
     switch (event->getType()) {
         case EVENT_WHEEL_CLOCKWISE: {
-            if (m_currentBaudIndex == 8) break;
-            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-            lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            scroll_anim(m_baudStateUI.roller, 100 * m_currentBaudIndex);
+            if (m_currentLedIndex == 8) break;
+            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+            lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
+            scroll_anim(m_baudStateUI.roller, 100 * m_currentLedIndex);
             break;
         }
 
         case EVENT_WHEEL_COUNTERCLOCKWISE: {
-            if (m_currentBaudIndex == 0) break;
-            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-            lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            scroll_anim(m_baudStateUI.roller, 100 * m_currentBaudIndex);
+            if (m_currentLedIndex == 0) break;
+            lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+            lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
+            scroll_anim(m_baudStateUI.roller, 100 * m_currentLedIndex);
             break;
         }
 
@@ -149,7 +149,8 @@ void FunctionBaudState::updateDisplay(DisplayContext* display)
     static int lastTime = millis();
 
     if (m_exit) {
-        background = false;
+        background = true;
+        m_currentLedIndex = m_currentBaudIndex;
     }
     display->updateBaudLED(m_currentLedIndex, background);
 
@@ -179,8 +180,8 @@ void FunctionBaudState::scroll_anim(lv_obj_t* obj, int32_t v)
 
 void FunctionBaudState::changeBaudRate()
 {
-    m_baudRate = m_baudRateList[m_currentBaudIndex];
-    m_currentLedIndex = m_currentBaudIndex;
+    m_baudRate = m_baudRateList[m_currentLedIndex];
+    m_currentBaudIndex = m_currentLedIndex;
 
     ShowSerial.end();
     COMSerial.end();

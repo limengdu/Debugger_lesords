@@ -54,7 +54,7 @@ void initLED() {
     pinMode(LED_CLOCK, OUTPUT);
     pinMode(LED_LATCH, OUTPUT);
 
-    displayContext.updateBaudLED(1, false);
+    displayContext.updateBaudLED(1, true);
 }
 
 void animBootCompleted(lv_anim_t* anim) {
