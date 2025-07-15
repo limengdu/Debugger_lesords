@@ -12,6 +12,7 @@
 
 #include "DapLink.h"
 #include "Global.h"
+#include "Tool.h"
 #include "LvglStyle.h"
 #include "frame.h"
 
@@ -140,6 +141,7 @@ void setup() {
     initStyle();
     initDapLink();
     initINA228();
+    initValueFromEEPROM();
     pinMode(BOOT_BTN, INPUT_PULLUP);
     pinMode(ENCODER_PINA, INPUT);
     pinMode(ENCODER_PINB, INPUT);
