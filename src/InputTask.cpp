@@ -9,7 +9,9 @@
 InputTask::InputTask() 
     : m_wheelTask(0), 
       m_buttonTask(0), 
-      m_stateMachine(0)
+      m_stateMachine(0),
+      wheelTrigger(false),
+      wheelLastInterruptTime(millis())
 {
 }
 
@@ -76,10 +78,50 @@ void InputTask::wheelTaskFunc(void* params) {
     StateMachine* stateMachine = inputTask->m_stateMachine;
     inputTask->m_encoderSta = EVENT_NONE;
 
+    int encoderA = 0, encoderB = 0;
+    static uint cntA       = 0;
+    static uint cntB       = 0;
+    static uint buffer     = 0;
+    static uint status     = 0;
+    static uint lastStatus = 0;
+
     attachInterruptArg(digitalPinToInterrupt(ENCODER_PINA), wheelInterruptHandler, inputTask, CHANGE);
     attachInterruptArg(digitalPinToInterrupt(ENCODER_PINB), wheelInterruptHandler, inputTask, CHANGE);
 
     for (;;) {
+        if (inputTask->wheelTrigger) {
+            encoderA = digitalRead(ENCODER_PINA);
+            encoderB = digitalRead(ENCODER_PINB);
+
+            if (encoderA) {
+                if (cntA)  cntA--;
+                else      status |= 0x01;
+            } else {
+                if (cntA < 4)  cntA++;
+                else        status &= ~0x01;
+            }
+
+            if (encoderB) {
+                if (cntB)  cntB--;
+                else      status |= 0x02;
+            } else {
+                if (cntB < 4)  cntB++;
+                else        status &= ~0x02;
+            }
+
+            if (lastStatus != status) {
+                lastStatus = status;
+                buffer <<= 2;
+                buffer |= status;
+                if (status == 0x03) {
+                    if (buffer == 0x87)       inputTask->m_encoderSta = EVENT_WHEEL_COUNTERCLOCKWISE;
+                    else if (buffer == 0x4B)  inputTask->m_encoderSta = EVENT_WHEEL_CLOCKWISE;
+                    buffer = 0;
+                    inputTask->wheelTrigger = false;
+                }
+            }
+        }
+
         if (inputTask->m_encoderSta == EVENT_WHEEL_COUNTERCLOCKWISE) {
             inputTask->m_encoderSta = EVENT_NONE;
 
@@ -92,48 +134,22 @@ void InputTask::wheelTaskFunc(void* params) {
             stateMachine->postEvent(&event);
         }
 
-        vTaskDelay(pdMS_TO_TICKS(30));
+        if (inputTask->wheelTrigger && (millis() - inputTask->wheelLastInterruptTime) <= 30) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+        } else {
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
     }
 }
 
 void InputTask::wheelInterruptHandler(void* params) {
     InputTask* inputTask = static_cast<InputTask*>(params);
-    int encoderA = 0, encoderB = 0;
-    static uint cntA       = 0;
-    static uint cntB       = 0;
-    static uint buffer     = 0;
-    static uint status     = 0;
-    static uint lastStatus = 0;
 
-    encoderA = digitalRead(ENCODER_PINA);
-    encoderB = digitalRead(ENCODER_PINB);
-
-    if (encoderA) {
-        if (cntA)  cntA--;
-        else      status |= 0x01;
-    } else {
-        if (cntA < 4)  cntA++;
-        else        status &= ~0x01;
+    if (millis() - inputTask->wheelLastInterruptTime <= 10) {
+        return;
     }
-
-    if (encoderB) {
-        if (cntB)  cntB--;
-        else      status |= 0x02;
-    } else {
-        if (cntB < 4)  cntB++;
-        else        status &= ~0x02;
-    }
-
-    if (lastStatus != status) {
-        lastStatus = status;
-        buffer <<= 2;
-        buffer |= status;
-        if (status == 0x03) {
-            if (buffer == 0x87)       inputTask->m_encoderSta = EVENT_WHEEL_COUNTERCLOCKWISE;
-            else if (buffer == 0x4B)  inputTask->m_encoderSta = EVENT_WHEEL_CLOCKWISE;
-            buffer = 0;
-        }
-    }
+    inputTask->wheelLastInterruptTime = millis();
+    inputTask->wheelTrigger = true;
 }
 
 void InputTask::buttonTaskFunc(void* params) {

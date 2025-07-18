@@ -18,6 +18,9 @@ private:
     TaskHandle_t m_wheelTask;
     TaskHandle_t m_buttonTask;
     StateMachine* m_stateMachine;
+
+    volatile unsigned long wheelLastInterruptTime;
+    bool wheelTrigger;
     
     static void wheelTaskFunc(void* params);
     static void buttonTaskFunc(void* params);
