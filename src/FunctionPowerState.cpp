@@ -352,6 +352,7 @@ void FunctionPowerState::createPowerComplexUI()
 
 void FunctionPowerState::onEnter()
 {
+    wheelLastInterruptTime = millis();
     if (m_powerStateUI.Screen != nullptr) {
         if (lv_scr_act() != m_powerStateUI.Screen) {
             lv_scr_load(m_powerStateUI.Screen);
@@ -380,6 +381,13 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
 {
     if (!machine || !event) {
         return false;
+    }
+
+    if (event->getType() == EVENT_WHEEL_CLOCKWISE || event->getType() == EVENT_WHEEL_COUNTERCLOCKWISE) {
+        if (millis() - wheelLastInterruptTime <= POWER_REFRESH_TIME) {
+            return false;
+        }
+        wheelLastInterruptTime = millis();
     }
 
     switch (event->getType()) {
