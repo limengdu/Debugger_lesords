@@ -442,7 +442,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[7];
+    char value[7], dateValue[9];
     float vol = 0, cur = 0, power = 0;
     static unsigned long lastTime = 0;
 
@@ -536,8 +536,8 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lv_label_set_text(m_powerStateUI.powerComplex.totalPower_Wh, value);
 
             currentTime = (currentTime - m_startTime) / 1000;
-            sprintf(value, "%02lu:%02lu:%02lu", currentTime / 60 / 60, currentTime / 60 % 60, currentTime % 60);
-            lv_label_set_text(m_powerStateUI.powerComplex.time, value);
+            snprintf(dateValue, sizeof(dateValue), "%02lu:%02lu:%02lu", currentTime / 60 / 60, currentTime / 60 % 60, currentTime % 60);
+            lv_label_set_text(m_powerStateUI.powerComplex.time, dateValue);
             break;
         }
 
