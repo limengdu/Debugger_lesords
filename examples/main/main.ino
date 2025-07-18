@@ -12,6 +12,7 @@
 
 #include "DapLink.h"
 #include "Global.h"
+#include "Tool.h"
 #include "LvglStyle.h"
 #include "frame.h"
 
@@ -147,6 +148,7 @@ void setup() {
     initDapLink();
     ShowSerial.begin(FunctionBaudState::m_baudRate);
     initINA228();
+    initValueFromEEPROM();
     pinMode(BOOT_BTN, INPUT_PULLUP);
     pinMode(ENCODER_PINA, INPUT);
     pinMode(ENCODER_PINB, INPUT);

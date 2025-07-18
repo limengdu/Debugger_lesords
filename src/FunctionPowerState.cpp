@@ -352,6 +352,7 @@ void FunctionPowerState::createPowerComplexUI()
 
 void FunctionPowerState::onEnter()
 {
+    wheelLastInterruptTime = millis();
     if (m_powerStateUI.Screen != nullptr) {
         if (lv_scr_act() != m_powerStateUI.Screen) {
             lv_scr_load(m_powerStateUI.Screen);
@@ -380,6 +381,13 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
 {
     if (!machine || !event) {
         return false;
+    }
+
+    if (event->getType() == EVENT_WHEEL_CLOCKWISE || event->getType() == EVENT_WHEEL_COUNTERCLOCKWISE) {
+        if (millis() - wheelLastInterruptTime <= POWER_REFRESH_TIME) {
+            return false;
+        }
+        wheelLastInterruptTime = millis();
     }
 
     switch (event->getType()) {
@@ -434,7 +442,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[7];
+    char value[7], dateValue[9];
     float vol = 0, cur = 0, power = 0;
     static unsigned long lastTime = 0;
 
@@ -528,8 +536,8 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
             lv_label_set_text(m_powerStateUI.powerComplex.totalPower_Wh, value);
 
             currentTime = (currentTime - m_startTime) / 1000;
-            sprintf(value, "%02lu:%02lu:%02lu", currentTime / 60 / 60, currentTime / 60 % 60, currentTime % 60);
-            lv_label_set_text(m_powerStateUI.powerComplex.time, value);
+            snprintf(dateValue, sizeof(dateValue), "%02lu:%02lu:%02lu", currentTime / 60 / 60, currentTime / 60 % 60, currentTime % 60);
+            lv_label_set_text(m_powerStateUI.powerComplex.time, dateValue);
             break;
         }
 
