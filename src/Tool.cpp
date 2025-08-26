@@ -50,8 +50,10 @@ double getCompensationCurrentLevel1(double x) {
         return -0.00075 + g_value.A[5];         // 超低电流区补偿
     } else if (x >= 0.00002) {
         return 0.30 * x - 0.00012 + g_value.A[6];
-    } else {
+    } else if (x >= 0.000001) {
         return -0.00045 + g_value.A[7];         // 超低电流补偿
+    } else {
+        return 0;
     }
 
     return 0;
