@@ -6,7 +6,7 @@
 
 struct EEPROM_VALUE_T {
   double A[8]; // level 1
-  double B[5]; // level 2
+  double B[6]; // level 2
   double C[4]; // level 3
 } g_value;
 
@@ -64,10 +64,12 @@ double getCompensationCurrentLevel2(double x) {
         return calFormula(x, -0.00055, 0.055) + g_value.B[1];                   // 中高电流区
     } else if (0.01 <= x && x < 0.02) {
         return calFormula(x, -0.00025, 0.035) + g_value.B[2];                   // 中电流区
-    } else if (0.007 <= x && x < 0.01) {
+    } else if (0.0085 <= x && x < 0.01) {
         return calFormula(x, 0.00012, 0.025, -3000, 5000000) + g_value.B[3];    // 低电流区
+    } else if (0.007 <= x && x < 0.0085) {
+        return calFormula(x, 0.00012, 0.025, -3000, 5000000) + g_value.B[4];    // 低电流区
     } else if (x < 0.007) {
-        return calFormula(x, -0.00182, 0.142) + g_value.B[4];                   // 超低电流区
+        return calFormula(x, -0.00182, 0.142) + g_value.B[5];                   // 超低电流区
     }
 
     return 0;
