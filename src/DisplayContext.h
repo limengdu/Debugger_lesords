@@ -39,11 +39,11 @@ public:
         mos1 = digitalRead(MOS1_PIN);
         mos2 = digitalRead(MOS2_PIN);
         if (mos1 == 0 && mos2 == 0) {
-            m_ina228->setShunt(10.0156, 0.0062);
+            m_ina228->setShunt(9.936290, 0.0062);
         } else if(mos1 == 1 && mos2 == 0) {
-            m_ina228->setShunt(1.0190, 0.1394);
+            m_ina228->setShunt(1.023875, 0.1394);
         } else if(mos1 == 1 && mos2 == 1) {
-            m_ina228->setShunt(0.10200, 1.0);
+            m_ina228->setShunt(0.105482, 1.0);
         }
     }
 

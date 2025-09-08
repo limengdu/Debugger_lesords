@@ -6,4 +6,6 @@ void initValueFromEEPROM();
 double getCompensationCurrent(double x);
 double getCompensationOfTemp(double x, double y);
 
+double calCompensationByShuntVol(double U);
+
 #endif
