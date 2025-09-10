@@ -4,6 +4,7 @@
 #include "StateManager.h"
 #include "LvglStyle.h"
 #include "FunctionBaudState.h"
+#include "DapLink.h"
 
 // MainMenuState实现
 MainMenuState::MainMenuState() 
@@ -251,6 +252,13 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     } else if (m_currentSelection == 1) {
         lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
         lv_obj_add_style(m_mainMenu.power_bg, &style_focus_bg, 0);
+    }
+
+    // Title LED
+    if (getUSBDeviceState() == 1) {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xACE62F));
+    } else {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xFF0000));
     }
 
     // RX

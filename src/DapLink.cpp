@@ -47,6 +47,18 @@ bool daplinkStatus = true;
 #define FREE_COUNT_INIT          (DAP_PACKET_COUNT)
 #define SEND_COUNT_INIT          0
 
+int getUSBDeviceState() {
+    if (!USBDevice.isInitialized()) {
+        return -1;
+    }
+
+    if (USBDevice.mounted() && usb_hid.ready()) {
+        return 1;
+    }
+
+    return 0;
+}
+
 void initDapLink(bool blocked) {
     delay(200);
 
