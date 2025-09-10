@@ -482,7 +482,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
             snprintf(value, sizeof(value), "%.4f", cur);
             lv_label_set_text(m_powerStateUI.powerMedium.current_A, value);
-            snprintf(value, sizeof(value), "%.3f", cur * 1000);
+            snprintf(value, sizeof(value), "%06.3f", cur * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.current_mA, value);
             snprintf(value, sizeof(value), "%f", cur * 1000 * 1000);
             if (value[5] == '.') value[5] = '\0';
