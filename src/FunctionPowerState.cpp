@@ -442,8 +442,8 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[7], dateValue[9];
-    float vol = 0, cur = 0, power = 0;
+    char value[7] = "", dateValue[9] = "";
+    double vol = 0, cur = 0, power = 0;
     static unsigned long lastTime = 0;
 
     ina228 = display->getINA228();
@@ -451,6 +451,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
     cur = _max(0.0, ina228->readCurrent() / 1000 + calCompensationByShuntVol(ina228->readShuntVoltage() / 1000) / 1000);
+    cur = (cur <= 0.000001) ? 0 : cur;
     // W
     power = vol * cur;
 
