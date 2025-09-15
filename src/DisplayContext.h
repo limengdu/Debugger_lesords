@@ -31,6 +31,9 @@ public:
 
     void setINA228(Adafruit_INA228* ina228) {
         m_ina228 = ina228;
+        m_ina228->setAveragingCount(INA228_COUNT_16);
+        m_ina228->setVoltageConversionTime(INA228_TIME_4120_us);
+        m_ina228->setCurrentConversionTime(INA228_TIME_4120_us);
     }
 
     void updateShuntOfINA() {

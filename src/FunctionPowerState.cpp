@@ -443,14 +443,18 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
     Adafruit_INA228* ina228 = nullptr;
     char value[7] = "", dateValue[9] = "";
-    double vol = 0, cur = 0, power = 0;
+    double vol = 0, cur = 0, power = 0, sumCur = 0;
     static unsigned long lastTime = 0;
 
     ina228 = display->getINA228();
     // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
-    cur = _max(0.0, ina228->readCurrent() / 1000 + calCompensationByShuntVol(ina228->readShuntVoltage() / 1000) / 1000);
+    for (int i = 0; i < 10; i++) {
+        cur = _max(0.0, ina228->readCurrent() / 1000 + calCompensationByShuntVol(ina228->readShuntVoltage() / 1000) / 1000);
+        sumCur += cur;
+    }
+    cur = sumCur / 10.0;
     cur = (cur <= 0.000001) ? 0 : cur;
     // W
     power = vol * cur;
