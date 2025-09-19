@@ -85,7 +85,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
     }
 
     switch (event->getType()) {
-        case EVENT_WHEEL_CLOCKWISE: {
+        case EVENT_WHEEL_COUNTERCLOCKWISE: {
             if (m_currentLedIndex == 8) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
@@ -93,7 +93,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             break;
         }
 
-        case EVENT_WHEEL_COUNTERCLOCKWISE: {
+        case EVENT_WHEEL_CLOCKWISE: {
             if (m_currentLedIndex == 0) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
