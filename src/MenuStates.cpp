@@ -279,7 +279,7 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
-    cur = _max(0.0, ina228->readCurrent() / 1000 + calCompensationByShuntVol(ina228->readShuntVoltage() / 1000) / 1000);
+    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensation(ina228));
     cur = (cur <= 0.000001) ? 0 : cur;
     // W
     power = vol * cur;

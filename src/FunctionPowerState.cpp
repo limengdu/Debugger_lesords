@@ -451,7 +451,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
     for (int i = 0; i < 10; i++) {
-        cur = _max(0.0, ina228->readCurrent() / 1000 + calCompensationByShuntVol(ina228->readShuntVoltage() / 1000) / 1000);
+        cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensation(ina228));
         sumCur += cur;
     }
     cur = sumCur / 10.0;
