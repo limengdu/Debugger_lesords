@@ -64,11 +64,11 @@ void FunctionBaudState::onEnter()
         lv_obj_set_style_text_color(m_baudStateUI.labels[i], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
         lv_obj_center(m_baudStateUI.labels[i]);
 
-        lv_obj_align_to(item, m_baudStateUI.roller, LV_ALIGN_CENTER, i * 100, (i % 2) ? -30 : 30);
-        lv_obj_align_to(line, m_baudStateUI.roller, LV_ALIGN_CENTER, i * 100, (i % 2) ? -5 : 5);
+        lv_obj_align_to(item, m_baudStateUI.roller, LV_ALIGN_CENTER, (NUM_BAUDRATES - i) * 100, (i % 2) ? 30 : -30);
+        lv_obj_align_to(line, m_baudStateUI.roller, LV_ALIGN_CENTER, (NUM_BAUDRATES - i) * 100, (i % 2) ? 5 : -5);
     }
 
-    lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * m_currentBaudIndex, LV_ANIM_OFF);
+    lv_obj_scroll_to_x(m_baudStateUI.roller, 100 * (NUM_BAUDRATES - m_currentBaudIndex), LV_ANIM_OFF);
     lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentBaudIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
 
     lv_scr_load(m_baudStateUI.screen);
@@ -89,7 +89,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             if (m_currentLedIndex == 8) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[++m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            scroll_anim(m_baudStateUI.roller, 100 * m_currentLedIndex);
+            scroll_anim(m_baudStateUI.roller, 100 * (NUM_BAUDRATES - m_currentLedIndex));
             break;
         }
 
@@ -97,7 +97,7 @@ bool FunctionBaudState::handleEvent(StateMachine* machine, const Event* event)
             if (m_currentLedIndex == 0) break;
             lv_obj_set_style_text_color(m_baudStateUI.labels[m_currentLedIndex], lv_color_hex(0xFFFFFF), LV_PART_MAIN);
             lv_obj_set_style_text_color(m_baudStateUI.labels[--m_currentLedIndex], lv_color_hex(0xACE62F), LV_PART_MAIN);
-            scroll_anim(m_baudStateUI.roller, 100 * m_currentLedIndex);
+            scroll_anim(m_baudStateUI.roller, 100 * (NUM_BAUDRATES - m_currentLedIndex));
             break;
         }
 
