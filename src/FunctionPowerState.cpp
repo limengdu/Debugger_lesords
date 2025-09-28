@@ -410,6 +410,10 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
                 int stateId = MainMenuState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
+                    m_startTime = 0;
+                    m_minCurrent = 999999, m_maxCurrent = 0.0;
+                    m_minPower = 999999, m_maxPower = 0.0;
+                    m_totalCurrent = m_totalPower = 0.0;
                     machine->changeState(nextState);
                     return true;
                 }
@@ -444,7 +448,7 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     Adafruit_INA228* ina228 = nullptr;
     char value[7] = "", dateValue[9] = "";
     double vol = 0, cur = 0, power = 0, sumCur = 0;
-    static unsigned long lastTime = 0;
+    unsigned long currentTime = 0;
 
     ina228 = display->getINA228();
     // V
@@ -461,11 +465,23 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
     if (m_currentIndex == POWER_INTERFACE_COMPLEX && !m_startTime) {
         m_startTime = millis();
-    } else if(m_currentIndex != POWER_INTERFACE_COMPLEX) {
-        m_startTime = 0;
-        m_minCurrent = m_maxCurrent = cur;
-        m_minPower = m_maxPower = power;
-        m_totalCurrent = m_totalPower = 0;
+        m_lastTime = m_startTime;
+    }
+
+    if (m_startTime) {
+        currentTime = millis();
+
+        double timeInterval = (double)(currentTime - m_lastTime) / 1000 / 360;
+        m_totalCurrent += cur * timeInterval;
+        m_totalPower += power * timeInterval;
+        m_lastTime = currentTime;
+
+        m_minCurrent = _min(m_minCurrent, cur);
+        m_minCurrent = _max(0, m_minCurrent);
+        m_minPower = _min(m_minPower, power);
+        m_minPower = _max(0, m_minPower);
+        m_maxCurrent = _max(m_maxCurrent, cur);
+        m_maxPower = _max(m_maxPower, power);
     }
 
     switch (m_currentIndex) {
@@ -501,22 +517,6 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
         }
 
         case POWER_INTERFACE_COMPLEX: {
-            unsigned long currentTime = millis();
-
-            if (lastTime != 0) {
-                double timeInterval = (double)(currentTime - lastTime) / 1000 / 360;
-                m_totalCurrent += cur * timeInterval;
-                m_totalPower += power * timeInterval;
-            }
-            lastTime = currentTime;
-
-            m_minCurrent = _min(m_minCurrent, cur);
-            m_minCurrent = _max(0, m_minCurrent);
-            m_minPower = _min(m_minPower, power);
-            m_minPower = _max(0, m_minPower);
-            m_maxCurrent = _max(m_maxCurrent, cur);
-            m_maxPower = _max(m_maxPower, power);
-
             snprintf(value, sizeof(value), "%.2f", vol);
             lv_label_set_text(m_powerStateUI.powerComplex.voltage, value);
             snprintf(value, sizeof(value), "%.2f", cur);

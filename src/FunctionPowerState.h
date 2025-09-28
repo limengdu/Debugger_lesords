@@ -71,6 +71,7 @@ public:
 private:
     POWER_STATE_UI_T m_powerStateUI;
     unsigned long m_startTime;
+    unsigned long m_lastTime;
     unsigned long wheelLastInterruptTime;
     int m_currentIndex;
     int m_update;
