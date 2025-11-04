@@ -16,6 +16,8 @@ Libraries that must be downloaded
 
 - TinyUSB: https://github.com/adafruit/Adafruit_TinyUSB_Arduino
 
+- I2C_EEPROM: https://github.com/RobTillaart/I2C_EEPROM
+
 ## Configuration items
 
 The following configuration needs to be modified to the corresponding options
@@ -48,6 +50,9 @@ git clone --depth 1 https://github.com/Lesords/TFT_eSPI.git -b feat/ST7789-EVT
 
 # LVGL
 git clone --depth 1 https://github.com/Lesords/lvgl.git -b feat/Debugger
+
+# I2C_EEPROM (tag 1.9.4)
+git clone https://github.com/RobTillaart/I2C_EEPROM.git
 
 # Debugger
 git clone --depth 1 https://github.com/Lesords/Debugger.git
