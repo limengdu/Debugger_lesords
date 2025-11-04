@@ -95,6 +95,9 @@ CompensationResult calCompensationByShuntVol(double U, int offset) {
             double seg_interval = (0.021018875 - 0.010019594) / 5;
             int seg_interval_idx = (U - 0.010019594 ) / seg_interval;
             seg_idx = 37 + seg_interval_idx;
+            if (g_value.value[seg_idx] == 0) {
+                seg_idx = 6;
+            }
         } else {
             seg_idx = 6;
         }
@@ -106,6 +109,9 @@ CompensationResult calCompensationByShuntVol(double U, int offset) {
             double seg_interval = (0.02638275 - 0.021018875) / 5;
             int seg_interval_idx = (U - 0.021018875 ) / seg_interval;
             seg_idx = 42 + seg_interval_idx;
+            if (g_value.value[seg_idx] == 0) {
+                seg_idx = 7;
+            }
         } else {
             seg_idx = 7;
         }
@@ -117,6 +123,9 @@ CompensationResult calCompensationByShuntVol(double U, int offset) {
             double seg_interval = (0.047608391 - 0.02638275) / 5;
             int seg_interval_idx = (U - 0.02638275 ) / seg_interval;
             seg_idx = 47 + seg_interval_idx;
+            if (g_value.value[seg_idx] == 0) {
+                seg_idx = 8;
+            }
         } else {
             seg_idx = 8;
         }
@@ -129,6 +138,9 @@ CompensationResult calCompensationByShuntVol(double U, int offset) {
             double seg_interval = (0.101737855 - 0.076459006) / 5;
             int seg_interval_idx = (U - 0.076459006 ) / seg_interval;
             seg_idx = 52 + seg_interval_idx;
+            if (g_value.value[seg_idx] == 0) {
+                seg_idx = 10;
+            }
         } else {
             seg_idx = 10;
         }
