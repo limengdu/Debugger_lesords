@@ -410,6 +410,10 @@ bool FunctionPowerState::handleEvent(StateMachine* machine, const Event* event)
                 int stateId = MainMenuState::ID;
                 State* nextState = StateManager::getInstance()->getState(stateId);
                 if (nextState) {
+                    m_startTime = 0;
+                    m_minCurrent = 999999, m_maxCurrent = 0.0;
+                    m_minPower = 999999, m_maxPower = 0.0;
+                    m_totalCurrent = m_totalPower = 0.0;
                     machine->changeState(nextState);
                     return true;
                 }
@@ -442,26 +446,42 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[7], dateValue[9];
-    float vol = 0, cur = 0, power = 0;
-    static unsigned long lastTime = 0;
+    char value[7] = "", dateValue[9] = "";
+    double vol = 0, cur = 0, power = 0, sumCur = 0;
+    unsigned long currentTime = 0;
 
     ina228 = display->getINA228();
     // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
-    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensationCurrent(ina228->readShuntVoltage() / 1000) / 1000);
-    cur = _max(0.0, cur + getCompensationOfTemp(cur / 1000, ina228->readDieTemp()));
+    for (int i = 0; i < 10; i++) {
+        cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensation(ina228));
+        sumCur += cur;
+    }
+    cur = sumCur / 10.0;
+    cur = (cur <= 0.000001) ? 0 : cur;
     // W
     power = vol * cur;
 
     if (m_currentIndex == POWER_INTERFACE_COMPLEX && !m_startTime) {
         m_startTime = millis();
-    } else if(m_currentIndex != POWER_INTERFACE_COMPLEX) {
-        m_startTime = 0;
-        m_minCurrent = m_maxCurrent = cur;
-        m_minPower = m_maxPower = power;
-        m_totalCurrent = m_totalPower = 0;
+        m_lastTime = m_startTime;
+    }
+
+    if (m_startTime) {
+        currentTime = millis();
+
+        double timeInterval = (double)(currentTime - m_lastTime) / 1000 / 360;
+        m_totalCurrent += cur * timeInterval;
+        m_totalPower += power * timeInterval;
+        m_lastTime = currentTime;
+
+        m_minCurrent = _min(m_minCurrent, cur);
+        m_minCurrent = _max(0, m_minCurrent);
+        m_minPower = _min(m_minPower, power);
+        m_minPower = _max(0, m_minPower);
+        m_maxCurrent = _max(m_maxCurrent, cur);
+        m_maxPower = _max(m_maxPower, power);
     }
 
     switch (m_currentIndex) {
@@ -471,6 +491,10 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
             snprintf(value, sizeof(value), "%.4f", cur);
             lv_label_set_text(m_powerStateUI.powerSimple.current, value);
+            lv_obj_set_style_text_color(
+                m_powerStateUI.powerSimple.current,
+                lv_color_hex(cur > 1.0f ? 0xFF0000 : 0x2FE6AC),
+                LV_PART_MAIN);
 
             snprintf(value, sizeof(value), "%.4f", power);
             lv_label_set_text(m_powerStateUI.powerSimple.power, value);
@@ -483,7 +507,11 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
 
             snprintf(value, sizeof(value), "%.4f", cur);
             lv_label_set_text(m_powerStateUI.powerMedium.current_A, value);
-            snprintf(value, sizeof(value), "%.3f", cur * 1000);
+            lv_obj_set_style_text_color(
+                m_powerStateUI.powerMedium.current_A,
+                lv_color_hex(cur > 1.0f ? 0xFF0000 : 0x2FE6AC),
+                LV_PART_MAIN);
+            snprintf(value, sizeof(value), "%06.3f", cur * 1000);
             lv_label_set_text(m_powerStateUI.powerMedium.current_mA, value);
             snprintf(value, sizeof(value), "%f", cur * 1000 * 1000);
             if (value[5] == '.') value[5] = '\0';
@@ -497,36 +525,32 @@ void FunctionPowerState::updateDisplay(DisplayContext* display)
         }
 
         case POWER_INTERFACE_COMPLEX: {
-            unsigned long currentTime = millis();
-
-            if (lastTime != 0) {
-                double timeInterval = (double)(currentTime - lastTime) / 1000 / 360;
-                m_totalCurrent += cur * timeInterval;
-                m_totalPower += power * timeInterval;
-            }
-            lastTime = currentTime;
-
-            m_minCurrent = _min(m_minCurrent, cur);
-            m_minCurrent = _max(0, m_minCurrent);
-            m_minPower = _min(m_minPower, power);
-            m_minPower = _max(0, m_minPower);
-            m_maxCurrent = _max(m_maxCurrent, cur);
-            m_maxPower = _max(m_maxPower, power);
-
             snprintf(value, sizeof(value), "%.2f", vol);
             lv_label_set_text(m_powerStateUI.powerComplex.voltage, value);
             snprintf(value, sizeof(value), "%.2f", cur);
             lv_label_set_text(m_powerStateUI.powerComplex.current, value);
+            lv_obj_set_style_text_color(
+                m_powerStateUI.powerComplex.current,
+                lv_color_hex(cur > 1.0f ? 0xFF0000 : 0x2FE6AC),
+                LV_PART_MAIN);
             snprintf(value, sizeof(value), "%.2f", power);
             lv_label_set_text(m_powerStateUI.powerComplex.power, value);
 
             snprintf(value, sizeof(value), "%.4f", m_minCurrent);
             lv_label_set_text(m_powerStateUI.powerComplex.minCurrent_A, value);
+            lv_obj_set_style_text_color(
+                m_powerStateUI.powerComplex.minCurrent_A,
+                lv_color_hex(m_minCurrent > 1.0f ? 0xFF0000 : 0x2FE6AC),
+                LV_PART_MAIN);
             snprintf(value, sizeof(value), "%.4f", m_minPower);
             lv_label_set_text(m_powerStateUI.powerComplex.minPower_W, value);
 
             snprintf(value, sizeof(value), "%.4f", m_maxCurrent);
             lv_label_set_text(m_powerStateUI.powerComplex.maxCurrent_A, value);
+            lv_obj_set_style_text_color(
+                m_powerStateUI.powerComplex.maxCurrent_A,
+                lv_color_hex(m_maxCurrent > 1.0f ? 0xFF0000 : 0x2FE6AC),
+                LV_PART_MAIN);
             snprintf(value, sizeof(value), "%.4f", m_maxPower);
             lv_label_set_text(m_powerStateUI.powerComplex.maxPower_W, value);
 

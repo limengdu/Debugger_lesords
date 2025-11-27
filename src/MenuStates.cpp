@@ -4,6 +4,7 @@
 #include "StateManager.h"
 #include "LvglStyle.h"
 #include "FunctionBaudState.h"
+#include "DapLink.h"
 
 // MainMenuState实现
 MainMenuState::MainMenuState() 
@@ -60,6 +61,12 @@ void MainMenuState::onEnter() {
     lv_obj_set_pos( label, 55 + 12 + 50, 18 );
     lv_obj_set_style_text_color(label, lv_color_hex(0xACE62F), LV_PART_MAIN);
     lv_obj_add_style(label, &style_font_28, 0);
+
+    label = lv_label_create(m_mainMenu.screen);
+    lv_label_set_text( label, FIRMWARE_VERSION );
+    lv_obj_align_to(label, m_mainMenu.screen, LV_ALIGN_TOP_RIGHT, -40, 38);
+    lv_obj_set_style_text_color(label, lv_color_hex(0x808080), LV_PART_MAIN);
+    lv_obj_add_style(label, &style_font_14, 0);
 
     m_mainMenu.ledTitle = lv_led_create(m_mainMenu.screen);
     lv_obj_set_pos(m_mainMenu.ledTitle, 55 + 12 + 50 + 110 + 3, 28);
@@ -239,8 +246,8 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     }
 
     Adafruit_INA228* ina228 = nullptr;
-    char value[7];
-    float vol = 0, cur = 0, power = 0;
+    char value[7] = "";
+    double vol = 0, cur = 0, power = 0;
 
     if (m_currentSelection == -1) {
         lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
@@ -251,6 +258,13 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     } else if (m_currentSelection == 1) {
         lv_obj_add_style(m_mainMenu.uart_bg, &style_nofocus_bg, 0);
         lv_obj_add_style(m_mainMenu.power_bg, &style_focus_bg, 0);
+    }
+
+    // Title LED
+    if (getUSBDeviceState() == 1) {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xACE62F));
+    } else {
+        lv_led_set_color(m_mainMenu.ledTitle, lv_color_hex(0xFF0000));
     }
 
     // RX
@@ -271,8 +285,8 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     // V
     vol = (ina228->readBusVoltage() / 1000 - ina228->readShuntVoltage()) / 1000;
     // A
-    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensationCurrent(ina228->readShuntVoltage() / 1000) / 1000);
-    cur = _max(0.0, cur + getCompensationOfTemp(cur / 1000, ina228->readDieTemp()));
+    cur = _max(0.0, ina228->readCurrent() / 1000 + getCompensation(ina228));
+    cur = (cur <= 0.000001) ? 0 : cur;
     // W
     power = vol * cur;
 
@@ -284,6 +298,27 @@ void MainMenuState::updateDisplay(DisplayContext* display) {
     snprintf(value, sizeof(value), "%.4f", cur);
     lv_label_set_text(m_mainMenu.cur, value);
 
+    // 超过 1A 标签改成红色
+    lv_obj_set_style_text_color(
+        m_mainMenu.cur, 
+        lv_color_hex(cur > 1.0f ? 0xFF0000 : 0xFFFFFF), 
+        LV_PART_MAIN
+    );
+
     snprintf(value, sizeof(value), "%.4f", power);
     lv_label_set_text(m_mainMenu.power, value);
+}
+
+// FunctionState实现
+void FunctionState::onEnter() {
+    // 默认实现，子类可以覆盖
+}
+
+void FunctionState::onExit() {
+    // 默认实现，子类可以覆盖
+}
+
+bool FunctionState::handleEvent(StateMachine* machine, const Event* event) {
+    // 默认实现，子类可以覆盖
+    return false;
 }
