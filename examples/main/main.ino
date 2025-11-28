@@ -141,12 +141,12 @@ void initINA228() {
 
 void setup() {
     // 硬件初始化
+    ShowSerial.begin(FunctionBaudState::m_baudRate);
     initSerial();
     initLED();
     initLVGL();
     initStyle();
     initDapLink();
-    ShowSerial.begin(FunctionBaudState::m_baudRate);
     initINA228();
     initValueFromEEPROM();
     pinMode(BOOT_BTN, INPUT_PULLUP);
